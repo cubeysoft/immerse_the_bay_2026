@@ -1,0 +1,94 @@
+{
+  "model_id": "vikhyatk/moondream2",
+  "model_name": "moondream2",
+  "model_revision": "2025-06-21",
+  "image_size": 378,
+  "budget_seconds": 1.0,
+  "stale_seconds": 15,
+  "max_new_tokens": 80,
+  "max_characters": 500,
+  "human_sources": ["operator_report", "dispatcher_confirmed"],
+  "vocabulary": [
+    {"name": "person_visible", "values": ["yes", "no", "unclear"]},
+    {
+      "name": "person_count",
+      "values": ["unclear", "many"],
+      "integers": {"minimum": 1, "maximum": 5, "above": "many"}
+    },
+    {"name": "posture", "values": ["upright", "seated", "reclined", "unclear"]},
+    {"name": "aed_like_object", "values": ["yes", "no", "unclear"]},
+    {"name": "smoke_visible", "values": ["yes", "no", "unclear"]}
+  ],
+  "forbidden_words": [
+    "unconscious",
+    "consciousness",
+    "responsive",
+    "responsiveness",
+    "breathing",
+    "gasping",
+    "pulse",
+    "cardiac arrest",
+    "dead",
+    "alive",
+    "age",
+    "sex",
+    "weight",
+    "identity",
+    "injury",
+    "bleeding",
+    "trauma",
+    "overdose",
+    "drowning",
+    "electrocution",
+    "shock",
+    "address",
+    "coordinates",
+    "car crash"
+  ],
+  "alignments": [
+    {
+      "claim": "aed_like_object",
+      "kind": "fact",
+      "agree": "yes",
+      "fact_field": "aed.available",
+      "fact_value": true,
+      "conflict": ["no"]
+    },
+    {
+      "claim": "smoke_visible",
+      "kind": "fact",
+      "agree": "yes",
+      "fact_field": "scene.visible_smoke",
+      "fact_value": true,
+      "conflict": ["no"]
+    },
+    {
+      "claim": "posture",
+      "kind": "phrase",
+      "phrases": {
+        "reclined": ["lying on the ground", "lying down", "on the ground", "on the floor"],
+        "upright": ["standing"],
+        "seated": ["sitting", "seated"]
+      }
+    },
+    {
+      "claim": "person_count",
+      "kind": "phrase",
+      "phrases": {
+        "1": ["one person", "one patient"],
+        "2": ["two people", "two patients"],
+        "3": ["three people", "three patients"],
+        "4": ["four people", "four patients"],
+        "5": ["five people", "five patients"],
+        "many": ["many people", "several people"]
+      }
+    },
+    {
+      "claim": "person_visible",
+      "kind": "phrase",
+      "phrases": {
+        "yes": ["there is a person", "a person is here", "someone is here"]
+      }
+    }
+  ]
+}

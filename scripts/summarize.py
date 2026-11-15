@@ -9,12 +9,13 @@ from dispatcher import compose_summary
 from incident import apply_event, new_context
 from session import load_events, reduce_events
 from transcriber import extract_transcript_facts
+from vision import corroborate_context
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _print_summary(title, summary):
+def _print_summary(title, summary, context):
     print(f"[{title}]")
     print(f"Session: {summary['session_id']}")
     print(
@@ -31,6 +32,20 @@ def _print_summary(title, summary):
     else:
         print("  none")
     print(f"Spoken briefing: {summary['spoken_text']}")
+    _print_vision(context)
+
+
+def _print_vision(context):
+    report = corroborate_context(context)
+    if not report:
+        return
+    print("Vision (not in the spoken briefing):")
+    for item in report:
+        described = ", ".join(
+            f"{claim['claim']}={claim['value']} ({claim['status']})"
+            for claim in item["claims"]
+        )
+        print(f"  {item['frame_id']}: {described}")
 
 
 def _operator_event(session_id, event_id, transcript, observed_at):
@@ -108,6 +123,7 @@ def summarize_events(events, title):
             summary_id=f"summary_{context['session_id']}",
             created_at=events[-1]["observed_at"],
         ),
+        context,
     )
 
 
@@ -120,11 +136,14 @@ def _print_builtin_demos():
     _print_summary(
         "EXAMPLE CONTEXT BRIEFING — NOT A DIAGNOSIS",
         compose_summary(example),
+        example,
     )
     print()
+    demo = _demo_context()
     _print_summary(
         "ADULT MALE NORMAL-BREATHING DEMO — NOT A DIAGNOSIS",
-        compose_summary(_demo_context(), summary_id="summary_demo_02"),
+        compose_summary(demo, summary_id="summary_demo_02"),
+        demo,
     )
 
 

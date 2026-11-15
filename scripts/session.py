@@ -110,6 +110,21 @@ def append_speech(
     return events
 
 
+def append_event(path, event, session_id):
+    events = load_events(path)
+    if events and events[0]["session_id"] != session_id:
+        raise ValueError(
+            f"{path} belongs to session {events[0]['session_id']}, not {session_id}"
+        )
+    if event.get("session_id") != session_id:
+        raise ValueError("event session_id does not match")
+    stored = dict(event)
+    stored["event_id"] = next_event_id(events)
+    events.append(stored)
+    save_events(path, events)
+    return events
+
+
 def reduce_events(events):
     if not events:
         raise ValueError("session has no events")

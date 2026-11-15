@@ -4,10 +4,19 @@
 from pathlib import Path
 import json
 import sys
+import time
 
 from dispatcher import FORBIDDEN_SPOKEN_TERMS, compose_summary, validate_summary
 from incident import EventValidationError, PERMITTED_FACT_FIELDS, apply_event, new_context
+from session import reduce_events
 from transcriber import extract_transcript_facts
+from vision import (
+    BUDGET_SECONDS,
+    corroborate_context,
+    look_at,
+    parse_model_text,
+    wait_until_idle,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -460,6 +469,273 @@ def check_examples():
     return errors
 
 
+def _claim(name, value):
+    return {
+        "claim": name,
+        "value": value,
+        "status": "uncorroborated",
+        "transcript_event_id": None,
+    }
+
+
+def _vision_event(event_id, claims, observed_at, *, person_count=1, include_vlm=True):
+    payload = {
+        "frame_id": "frame_88",
+        "image_width": 378,
+        "image_height": 378,
+        "claims": claims,
+    }
+    if person_count is not None:
+        payload["detector"] = {
+            "name": "yolov9",
+            "person_count": person_count,
+            "confidence": 0.86,
+        }
+    if include_vlm:
+        payload["vlm"] = {
+            "name": "moondream2",
+            "revision": "2025-06-21",
+            "latency_ms": 40,
+        }
+    return make_event(
+        event_id,
+        event_type="vision_hypothesis",
+        source="cv_model",
+        observed_at=observed_at,
+        payload=payload,
+    )
+
+
+def _claim_status(context, name):
+    report = corroborate_context(context)
+    if not report:
+        return None
+    for item in report[-1]["claims"]:
+        if item["claim"] == name:
+            return item
+    return None
+
+
+def _spoken(events):
+    return compose_summary(reduce_events(events))["spoken_text"]
+
+
+def check_vision():
+    errors = []
+    if BUDGET_SECONDS != 1:
+        errors.append("vision budget must stay at one second so audio remains the fallback")
+
+    still_at = "2026-11-14T19:00:00Z"
+    speech_at = "2026-11-14T19:00:10Z"
+    aed_yes = _vision_event("vision-aed", [_claim("aed_like_object", "yes")], still_at)
+    aed_no = _vision_event("vision-no-aed", [_claim("aed_like_object", "no")], still_at)
+    aed_speech = transcript_event("speech-aed", "I have an AED.", observed_at=speech_at)
+    no_aed_speech = transcript_event("speech-no-aed", "We have no AED.", observed_at=speech_at)
+
+    def require_status(context, name, expected, label):
+        found = _claim_status(context, name)
+        if found is None or found["status"] != expected:
+            errors.append(label)
+            return None
+        return found
+
+    agreed = reduce_events([aed_yes, aed_speech])
+    agreed_claim = require_status(
+        agreed, "aed_like_object", "corroborated", "AED speech inside 15 seconds did not corroborate the still"
+    )
+    if agreed_claim and agreed_claim["transcript_event_id"] != "speech-aed":
+        errors.append("corroboration did not point at the transcript event")
+    if agreed["facts"]["aed.available"]["source"] != "operator_report" or agreed["facts"]["aed.available"]["value"] is not True:
+        errors.append("AED corroboration changed the operator fact")
+    if _spoken([aed_yes, aed_speech]) != _spoken([aed_speech]):
+        errors.append("a corroborated still changed the spoken briefing")
+
+    alone = reduce_events([aed_yes])
+    if alone["facts"]["aed.available"]["value"] is not None:
+        errors.append("a vision hypothesis wrote aed.available with nobody speaking")
+    require_status(alone, "aed_like_object", "uncorroborated", "an unspoken still was treated as confirmed")
+
+    stale_speech = transcript_event("speech-stale", "I have an AED.", observed_at="2026-11-14T19:00:16Z")
+    require_status(
+        reduce_events([aed_yes, stale_speech]),
+        "aed_like_object",
+        "uncorroborated",
+        "a still older than 15 seconds corroborated a new line",
+    )
+    boundary_speech = transcript_event("speech-boundary", "I have an AED.", observed_at="2026-11-14T19:00:15Z")
+    require_status(
+        reduce_events([aed_yes, boundary_speech]),
+        "aed_like_object",
+        "corroborated",
+        "a still 15 seconds before speech was treated as stale",
+    )
+
+    early_speech = transcript_event("speech-early", "I have an AED.", observed_at=still_at)
+    later_still = _vision_event("vision-later", [_claim("aed_like_object", "yes")], "2026-11-14T19:00:05Z")
+    require_status(
+        reduce_events([early_speech, later_still]),
+        "aed_like_object",
+        "corroborated",
+        "a still just after the latest line did not corroborate it",
+    )
+    too_late = _vision_event("vision-too-late", [_claim("aed_like_object", "yes")], "2026-11-14T19:00:20Z")
+    require_status(
+        reduce_events([early_speech, too_late]),
+        "aed_like_object",
+        "uncorroborated",
+        "a still 20 seconds after speech corroborated an old line",
+    )
+
+    conflict = reduce_events([aed_no, aed_speech])
+    require_status(conflict, "aed_like_object", "conflict", "a still that misses a spoken AED was not a conflict")
+    if conflict["facts"]["aed.available"]["value"] is not True:
+        errors.append("a conflicting still cleared the operator's AED report")
+    if _spoken([aed_no, aed_speech]) != _spoken([aed_speech]):
+        errors.append("a conflicting still changed the spoken briefing")
+
+    negative = reduce_events([aed_no, no_aed_speech])
+    require_status(
+        negative,
+        "aed_like_object",
+        "uncorroborated",
+        "a negative still corroborated a negative speech value",
+    )
+    if negative["facts"]["aed.available"]["value"] is not False:
+        errors.append("negative speech lost aed.available=false")
+
+    opposite = reduce_events([aed_yes, no_aed_speech])
+    require_status(
+        opposite, "aed_like_object", "conflict", "a positive still against a spoken absence was not a conflict"
+    )
+    if opposite["facts"]["aed.available"]["source"] != "operator_report":
+        errors.append("a positive still overrode a spoken AED absence")
+
+    gasping = transcript_event("speech-gasp", "They are gasping.", observed_at=speech_at)
+    reclined = _vision_event("vision-posture", [_claim("posture", "reclined")], still_at)
+    gasp_context = reduce_events([reclined, gasping])
+    if gasp_context["facts"]["patient.breathing"]["value"] != "gasping":
+        errors.append("gasping speech was lost beside a posture claim")
+    if gasp_context["facts"]["patient.responsive"]["value"] is not None:
+        errors.append("a reclined posture set patient.responsive")
+    require_status(gasp_context, "posture", "uncorroborated", "gasping speech corroborated a reclined posture")
+    gasp_spoken = _spoken([reclined, gasping])
+    if gasp_spoken != _spoken([gasping]):
+        errors.append("a posture claim changed the spoken briefing")
+    for term in FORBIDDEN_SPOKEN_TERMS:
+        if term in gasp_spoken.lower():
+            errors.append(f"posture briefing contains forbidden term: {term}")
+
+    dispatcher = transcript_event(
+        "speech-ground",
+        "You said they are on the ground.",
+        source="dispatcher_confirmed",
+        observed_at=speech_at,
+    )
+    ground = reduce_events([reclined, dispatcher])
+    ground_claim = require_status(
+        ground, "posture", "corroborated", "dispatcher posture words did not corroborate reclined"
+    )
+    if ground_claim and ground_claim["transcript_event_id"] != "speech-ground":
+        errors.append("posture corroboration did not point at the dispatcher line")
+    if ground["facts"]["patient.responsive"]["value"] is not None:
+        errors.append("dispatcher posture words set patient.responsive")
+    if _spoken([reclined, dispatcher]) != _spoken([dispatcher]):
+        errors.append("corroborated posture changed the spoken briefing")
+
+    smoke_speech = transcript_event("speech-smoke", "There is visible smoke.", observed_at=speech_at)
+    smoke_still = _vision_event("vision-smoke", [_claim("smoke_visible", "yes")], still_at)
+    smoke_context = reduce_events([smoke_still, smoke_speech])
+    require_status(smoke_context, "smoke_visible", "corroborated", "spoken smoke did not corroborate smoke_visible")
+    if smoke_context["facts"]["scene.visible_smoke"]["source"] != "operator_report":
+        errors.append("smoke corroboration changed the fact source")
+
+    interim = transcript_event("speech-interim", "I have an AED.", observed_at=speech_at)
+    interim["payload"]["is_final"] = False
+    interim_context = new_context()
+    interim_context["event_history"] = [interim, aed_yes]
+    require_status(
+        interim_context, "aed_like_object", "uncorroborated", "an interim transcript corroborated a still"
+    )
+
+    for fact in agreed["facts"].values():
+        if fact["source"] == "cv_model":
+            errors.append("a fact lists cv_model as its source")
+
+    context = new_context()
+    oversized = _vision_event("bad-size", [_claim("posture", "reclined")], still_at)
+    oversized["payload"]["image_width"] = 1000
+    fact_payload = _vision_event("bad-facts", [_claim("posture", "reclined")], still_at)["payload"]
+    fact_payload["facts"] = [{"field": "patient.breathing", "value": "gasping"}]
+    rejected = [
+        ("clinical vision claim", _vision_event("bad-clinical", [_claim("patient.breathing", "gasping")], still_at)),
+        ("unconscious posture", _vision_event("bad-unconscious", [_claim("posture", "unconscious")], still_at)),
+        (
+            "vision fact payload",
+            make_event(
+                "bad-facts",
+                event_type="vision_hypothesis",
+                source="cv_model",
+                observed_at=still_at,
+                payload=fact_payload,
+            ),
+        ),
+        ("oversized still", oversized),
+        (
+            "model ran with nobody present",
+            _vision_event(
+                "bad-empty",
+                [_claim("person_visible", "no")],
+                still_at,
+                person_count=0,
+                include_vlm=True,
+            ),
+        ),
+    ]
+    for label, event in rejected:
+        expect_rejected(errors, label, context, event)
+
+    model_json = (
+        '{"person_visible":"yes","person_count":7,"posture":"reclined",'
+        '"aed_like_object":"unclear","smoke_visible":"unclear"}'
+    )
+    parsed = {item["claim"]: item["value"] for item in (parse_model_text(model_json) or [])}
+    if parsed.get("person_count") != "many":
+        errors.append("person_count above 5 was not stored as many")
+    if parse_model_text("The patient is unconscious.") is not None:
+        errors.append("clinical prose was accepted as a vision claim")
+    extra = model_json[:-1] + ',"diagnosis":"arrest"}'
+    if parse_model_text(extra) is not None:
+        errors.append("an unknown vision key was accepted")
+
+    def fail_if_called(_image):
+        raise AssertionError("the model ran")
+
+    skipped = look_at(None, fail_if_called, person_count=0)
+    if skipped.mode != "vision" or skipped.reason != "detector" or skipped.claims != [_claim("person_visible", "no")]:
+        errors.append("a zero person count still called the vision model")
+
+    def slow(_image):
+        time.sleep(0.3)
+        return model_json
+
+    timed_out = look_at(None, slow, budget_s=0.05)
+    busy = look_at(None, slow, budget_s=0.05)
+    if not wait_until_idle():
+        errors.append("a timed-out vision call never released the look")
+    if timed_out.mode != "audio" or timed_out.reason != "timeout" or timed_out.claims:
+        errors.append("a slow look was not dropped in favor of audio")
+    if busy.mode != "audio" or busy.reason != "busy":
+        errors.append("a second look started while the first was still running")
+
+    def crash(_image):
+        raise RuntimeError("down")
+
+    crashed = look_at(None, crash, budget_s=1)
+    if crashed.mode != "audio" or crashed.reason != "model_error":
+        errors.append("a crashed look did not fall back to audio")
+    return errors
+
+
 def check():
     errors = []
     errors.extend(check_contracts())
@@ -469,6 +745,7 @@ def check():
     errors.extend(check_event_validation())
     errors.extend(check_briefing())
     errors.extend(check_examples())
+    errors.extend(check_vision())
     return errors
 
 
@@ -482,7 +759,8 @@ if __name__ == "__main__":
     case_count = len(load("tests/routing.json")["cases"])
     print(
         f"PASS: Meta STT boundary, {case_count} exact transcript cases, explicit help, "
-        "location fallback, event rejection, provenance and Twilio briefing."
+        "location fallback, event rejection, provenance, vision corroboration, "
+        "one-second audio fallback and Twilio briefing."
     )
     print(
         "IMPORTANT: This is not an STT accuracy test, clinical approval, "

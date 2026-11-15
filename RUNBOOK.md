@@ -21,12 +21,13 @@ python3 scripts/validate.py
 Expected result:
 
 ```text
-PASS: Meta STT boundary, 36 exact transcript cases, explicit help, location fallback, event rejection, provenance and Twilio briefing.
+PASS: Meta STT boundary, 36 exact transcript cases, explicit help, location fallback, event rejection, provenance, vision corroboration, one-second audio fallback and Twilio briefing.
 IMPORTANT: This is not an STT accuracy test, clinical approval, API integration test, or proof of headset performance.
 ```
 
 This checks transcript extraction, event validation, source authority, conflict handling, location
-fallback, and deterministic spoken briefings.
+fallback, vision corroboration, the one-second audio fallback, and deterministic spoken briefings.
+It does not load moondream2.
 
 ## Run the briefing demo
 
@@ -81,6 +82,30 @@ python3 scripts/transcribe_audio.py --mic --seconds 8 --source operator_report
 `transcripts` keeps every finished operator and dispatcher line. `spoken_text` is a separate natural-language briefing for dispatch. A dispatcher instruction that matches no fact is included in that briefing, for example: “The dispatcher said, push hard in the center of the chest.”
 
 `runtime/session.json` is local session state and is gitignored. Delete it to start a new session. Pass `--session path.json` and `--session-id your_id` to write somewhere else. A file that already belongs to another session id is left unchanged.
+
+## Assess one still
+
+Optional. The demo commands above do not run this, and they do not load moondream2. Leave it out of a laptop demo: on this Mac the vision path does not finish inside its limit.
+
+The command needs the packages in `requirements-vision.txt` and the local moondream2 weights, revision `2025-06-21`.
+
+```sh
+python3 -m pip install -r requirements-vision.txt
+python3 scripts/assess_still.py scene.jpg --frame-id frame_88
+```
+
+The one-second limit includes loading the weights. The first load is the overhead before any answer. On this Mac, November 14, 2026, that load took about 5 seconds from the local Hugging Face cache. One 378 px look then took about 25 seconds and did not return a usable answer. Because the load itself is past one second, the command returns audio in about one second and exits. It does not wait for the weights to finish loading, and it does not write the session file.
+
+Expected result on this machine:
+
+```text
+{"mode": "audio", "reason": "timeout", "latency_ms": 1000, "claims": []}
+Vision took longer than one second. The spoken briefing stays on the transcript.
+```
+
+`--person-count 0` records that the detector saw nobody and does not start the load.
+
+A stored claim is not a fact. It becomes support for something a person already said only when a final operator or dispatcher line states the same allowlisted thing. The phone briefing does not gain a sentence from the still.
 
 ## What is incoming
 

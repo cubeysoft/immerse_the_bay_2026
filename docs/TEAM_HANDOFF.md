@@ -10,7 +10,7 @@
 
 ## Vision teammate
 
-Keep vision output separate from the transcript-to-call event stream. Each detection should include frame timestamp, stable per-person ID if possible, bounding-box coordinate convention, model identifier, class confidence and 33 BlazePose landmarks with visibility if used.
+Keep vision output separate from the transcript-to-call event stream. The implementation plan and the current code are described in `VISION.md`. YOLOv9 on the Quest supplies a person count. moondream2 on the laptop reads one still. If that read takes longer than one second, including the first weight load, the briefing stays on the transcript. On the current laptop the load takes about 5 seconds and one look takes about 25 seconds, so the demo stays on audio. A claim is not a fact unless a final operator or dispatcher line says the same allowlisted thing. Do not add those claims to `spoken_text`. BlazePose is not part of this stage.
 
 Landmarks are estimated keypoints; they do not reveal actual bones, breathing, pulse, consciousness or emergency cause. Do not output medical categories from CV. For a Quest example, review Meta's `PassthroughCameraAccess` and YOLOv9 reference in `knowledge-base/sources.json`.
 

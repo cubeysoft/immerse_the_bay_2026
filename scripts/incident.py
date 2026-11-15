@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
-"""Validate Meta STT-derived events and reduce them into incident context."""
+"""Validate events and reduce them into incident context.
+
+Vision hypotheses are stored beside the transcript. They do not write facts.
+"""
 
 from datetime import datetime
 from pathlib import Path
 import copy
 import json
+
+from vision import validate_hypothesis_payload
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +31,7 @@ EVENT_SOURCES = {
     },
     "aed_telemetry": {"aed_telemetry"},
     "call_status": {"phone_server"},
+    "vision_hypothesis": {"cv_model"},
 }
 
 EVENT_FIELD_PREFIXES = {
@@ -235,6 +241,12 @@ def validate_event(context, event):
     if event_type == "call_status" and payload.get("status") not in CALL_STATUSES:
         raise EventValidationError("call_status event has invalid status")
 
+    if event_type == "vision_hypothesis":
+        try:
+            validate_hypothesis_payload(payload)
+        except ValueError as exc:
+            raise EventValidationError(str(exc)) from exc
+
 
 def _fact_wins(existing, incoming_source, incoming_at, incoming_event_id):
     if existing["value"] is None:
@@ -347,6 +359,8 @@ def apply_event(context, event):
     event_type = event["type"]
     payload = event["payload"]
 
+    if event_type == "vision_hypothesis":
+        return updated
     if event_type == "call_status":
         status = payload["status"]
         updated["communications"]["test_call_status"] = status
