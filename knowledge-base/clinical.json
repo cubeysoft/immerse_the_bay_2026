@@ -1,0 +1,301 @@
+{
+  "scope": "US / untrained bystander / training-first draft",
+  "note": "Source-backed candidate phrases only. Do not infer that any entry is approved merely because a source URL is listed. Clinical owners must validate all wording, age eligibility, AED manufacturer instructions, and safety conditions.",
+  "normal_breathing_rule": "Unresponsive AND absent or abnormal breathing (including gasping) is a possible cardiac arrest scenario; never derive breathing status from pose alone.",
+  "entries": [
+    {
+      "id": "assess.scene",
+      "intent": "scene_safety",
+      "patient": [
+        "adult",
+        "child",
+        "infant"
+      ],
+      "stage": "assessment",
+      "say": "Make sure it is safe to approach.",
+      "sources": [
+        "redcross_cpr_steps",
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "assess.response",
+      "intent": "check_responsiveness",
+      "patient": [
+        "adult",
+        "child",
+        "infant"
+      ],
+      "stage": "assessment",
+      "say": "Check whether the person responds when you speak loudly and gently tap them.",
+      "sources": [
+        "redcross_cpr_steps",
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "assess.breath",
+      "intent": "check_breathing",
+      "patient": [
+        "adult",
+        "child",
+        "infant"
+      ],
+      "stage": "assessment",
+      "say": "Look for normal breathing. Gasping is not normal breathing.",
+      "sources": [
+        "aha_adult_2025",
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "help.call",
+      "intent": "call_emergency",
+      "patient": [
+        "adult",
+        "child",
+        "infant"
+      ],
+      "stage": "emergency_response",
+      "say": "Call 911 now, or tell someone nearby to call. Ask someone to bring an AED if available.",
+      "sources": [
+        "aha_adult_2025",
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "cpr.adult.start",
+      "intent": "start_cpr",
+      "patient": [
+        "adult"
+      ],
+      "stage": "cpr",
+      "say": "If the person is unresponsive and not breathing normally, start chest compressions. Push hard and fast in the center of the chest.",
+      "sources": [
+        "aha_adult_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "cpr.adult.hands",
+      "intent": "compression_position",
+      "patient": [
+        "adult"
+      ],
+      "stage": "cpr",
+      "say": "Place the heel of one hand in the center of the chest, your other hand on top, and keep your arms straight.",
+      "sources": [
+        "redcross_cpr_steps"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "cpr.rate",
+      "intent": "compression_rate",
+      "patient": [
+        "adult",
+        "child",
+        "infant"
+      ],
+      "stage": "cpr",
+      "say": "Aim for 100 to 120 chest compressions per minute. Let the chest rise fully between compressions.",
+      "sources": [
+        "aha_adult_2025",
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "cpr.adult.depth",
+      "intent": "compression_depth",
+      "patient": [
+        "adult"
+      ],
+      "stage": "cpr",
+      "say": "Push at least 2 inches, or 5 centimeters, deep; avoid going deeper than 2.4 inches, or 6 centimeters.",
+      "sources": [
+        "aha_adult_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "cpr.child.depth",
+      "intent": "compression_depth",
+      "patient": [
+        "child"
+      ],
+      "stage": "cpr",
+      "say": "Push about one third the depth of the chest, approximately 2 inches or 5 centimeters.",
+      "sources": [
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "cpr.infant.depth",
+      "intent": "compression_depth",
+      "patient": [
+        "infant"
+      ],
+      "stage": "cpr",
+      "say": "Push about one third the depth of the chest, approximately 1.5 inches or 4 centimeters.",
+      "sources": [
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "cpr.child.position",
+      "intent": "compression_position",
+      "patient": [
+        "child"
+      ],
+      "stage": "cpr",
+      "say": "Use the heel of one or two hands in the center of the chest, according to the size of the child.",
+      "sources": [
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "cpr.infant.position",
+      "intent": "compression_position",
+      "patient": [
+        "infant"
+      ],
+      "stage": "cpr",
+      "say": "Use the heel of one hand on the breastbone, or use two thumbs while your hands encircle the chest. Do not use the old two-finger technique.",
+      "sources": [
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "cpr.pediatric.breaths",
+      "intent": "compression_breath_sequence",
+      "patient": [
+        "child",
+        "infant"
+      ],
+      "stage": "cpr",
+      "say": "If you can give rescue breaths, alternate 30 chest compressions with 2 breaths. Give only enough air to make the chest rise.",
+      "sources": [
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "cpr.pediatric.no_breaths",
+      "intent": "unable_to_give_breaths",
+      "patient": [
+        "child",
+        "infant"
+      ],
+      "stage": "cpr",
+      "say": "If you cannot give breaths, continue chest compressions. Compression-only CPR is better than no CPR.",
+      "sources": [
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "aed.power",
+      "intent": "turn_on_aed",
+      "patient": [
+        "adult",
+        "child",
+        "infant"
+      ],
+      "stage": "aed",
+      "say": "Turn on the AED and follow its spoken instructions.",
+      "sources": [
+        "redcross_aed_steps"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "aed.pads",
+      "intent": "attach_pads",
+      "patient": [
+        "adult",
+        "child",
+        "infant"
+      ],
+      "stage": "aed",
+      "say": "Expose the chest and attach the pads exactly as shown on their pictures. If needed, dry the pad areas.",
+      "sources": [
+        "redcross_aed_steps"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "aed.pediatric.pads",
+      "intent": "pediatric_aed_pads",
+      "patient": [
+        "child",
+        "infant"
+      ],
+      "stage": "aed",
+      "say": "Use pediatric pads or a pediatric setting if available and appropriate for this AED. If using adult pads, make sure the pads do not touch each other. Follow the AED instructions.",
+      "sources": [
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "aed.clear",
+      "intent": "clear_for_analysis_or_shock",
+      "patient": [
+        "adult",
+        "child",
+        "infant"
+      ],
+      "stage": "aed",
+      "say": "Keep everyone clear of the person while the AED analyzes or delivers a shock. Follow the AED prompts.",
+      "sources": [
+        "redcross_aed_steps"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    },
+    {
+      "id": "aed.resume",
+      "intent": "resume_cpr",
+      "patient": [
+        "adult",
+        "child",
+        "infant"
+      ],
+      "stage": "aed",
+      "say": "Resume CPR immediately after the AED instructs you to, whether a shock was given or not.",
+      "sources": [
+        "redcross_aed_steps",
+        "aha_adult_2025",
+        "aha_pediatric_2025"
+      ],
+      "approval": "draft_not_for_emergency_use",
+      "emergency_output_enabled": false
+    }
+  ]
+}

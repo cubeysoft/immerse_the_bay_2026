@@ -1,0 +1,9 @@
+{
+  "mode": "training",
+  "active_lesson_id": null,
+  "active_clip_id": null,
+  "player_state": "idle",
+  "speed": 1.0,
+  "interrupted_by_emergency": false,
+  "note": "Media state is separate from clinical context."
+}

@@ -1,0 +1,61 @@
+{
+  "profile": "quest3_prototype",
+  "status": "needs_hardware_benchmarks",
+  "xr": {
+    "manufacturer": "Meta",
+    "model": "Quest 3",
+    "runtime": "Unity / Meta Horizon OS",
+    "camera": {
+      "api": "MRUK PassthroughCameraAccess",
+      "platform_requirements": "supported Horizon OS, correct permissions, passthrough enabled; validate installed SDK release",
+      "stream_to_cv": "local_frames",
+      "medical_diagnostic_use_allowed": false
+    },
+    "media": {
+      "training": "Unity VideoPlayer → RenderTexture → world-space UI",
+      "emergency": "training playback stops; no long videos"
+    },
+    "ai": {
+      "local_slm_candidates": [
+        "rules_only",
+        "SmolLM-360M",
+        "Qwen-0.5B"
+      ],
+      "choice": "benchmark_required",
+      "stt": "Meta Unity AI SpeechToTextAgent; treat selected provider as network-dependent until measured otherwise"
+    },
+    "communications": {
+      "https": "UnityWebRequest to AWS API",
+      "audio": "paired phone or separately integrated VoIP; HTTPS alone does not bridge headset audio"
+    },
+    "location": {
+      "source": "paired phone location or explicitly provided supported provider; Quest location is not assumed to be precise GPS",
+      "accuracy_required": true
+    }
+  },
+  "aed": {
+    "manufacturer": null,
+    "model": null,
+    "telemetry_available": false,
+    "phase": "unknown",
+    "shock_control_available": false,
+    "manufacturer_manual": null
+  },
+  "future_platforms": [
+    {
+      "id": "meta_ray_ban_display",
+      "video": "possible via compatible app/display SDK; investigate content availability and offline limitations"
+    },
+    {
+      "id": "ray_ban_meta_no_display",
+      "video": "no in-lens display; audio or companion phone required"
+    }
+  ],
+  "source_ids": [
+    "meta_camera",
+    "meta_camera_unity",
+    "meta_inference",
+    "meta_ai_building_blocks",
+    "meta_wearables"
+  ]
+}

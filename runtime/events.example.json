@@ -1,0 +1,94 @@
+[
+  {
+    "event_id": "evt_001",
+    "session_id": "sim_demo_001",
+    "type": "help_request",
+    "source": "app",
+    "observed_at": "2026-11-14T19:00:00Z",
+    "received_at": "2026-11-14T19:00:00Z",
+    "payload": {
+      "facts": [
+        {
+          "field": "incident.help_requested",
+          "value": true
+        }
+      ]
+    }
+  },
+  {
+    "event_id": "evt_002",
+    "session_id": "sim_demo_001",
+    "type": "speech_transcript",
+    "source": "operator_report",
+    "observed_at": "2026-11-14T19:00:01Z",
+    "received_at": "2026-11-14T19:00:02Z",
+    "payload": {
+      "transcript": "I am by the highway. Someone is unconscious.",
+      "stt_provider": "meta_unity_ai_stt",
+      "is_final": true,
+      "confidence": 0.92,
+      "facts": [
+        {
+          "field": "patient.responsive",
+          "value": false,
+          "evidence": "Someone is unconscious."
+        },
+        {
+          "field": "scene.location_description",
+          "value": "roadside",
+          "evidence": "by the highway"
+        }
+      ],
+      "unresolved": []
+    }
+  },
+  {
+    "event_id": "evt_003",
+    "session_id": "sim_demo_001",
+    "type": "speech_transcript",
+    "source": "operator_report",
+    "observed_at": "2026-11-14T19:00:08Z",
+    "received_at": "2026-11-14T19:00:09Z",
+    "payload": {
+      "transcript": "They are gasping.",
+      "stt_provider": "meta_unity_ai_stt",
+      "is_final": true,
+      "confidence": 0.88,
+      "facts": [
+        {
+          "field": "patient.breathing",
+          "value": "gasping",
+          "evidence": "They are gasping."
+        }
+      ],
+      "unresolved": []
+    }
+  },
+  {
+    "event_id": "evt_004",
+    "session_id": "sim_demo_001",
+    "type": "location_update",
+    "source": "companion_phone",
+    "observed_at": "2026-11-14T19:00:10Z",
+    "received_at": "2026-11-14T19:00:10Z",
+    "payload": {
+      "lat": null,
+      "lon": null,
+      "accuracy_m": null,
+      "status": "unavailable"
+    }
+  },
+  {
+    "event_id": "evt_005",
+    "session_id": "sim_demo_001",
+    "type": "call_status",
+    "source": "phone_server",
+    "observed_at": "2026-11-14T19:00:12Z",
+    "received_at": "2026-11-14T19:00:12Z",
+    "payload": {
+      "call_type": "test_dispatcher",
+      "status": "requested",
+      "provider_reference": null
+    }
+  }
+]

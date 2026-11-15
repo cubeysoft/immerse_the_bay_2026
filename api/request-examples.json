@@ -1,0 +1,71 @@
+{
+  "create_session": {
+    "method": "POST",
+    "path": "/v1/sessions",
+    "body": {
+      "mode": "emergency_simulation",
+      "client_session_id": "sim_demo_001",
+      "location": {
+        "lat": null,
+        "lon": null,
+        "accuracy_m": null,
+        "source": "unknown",
+        "captured_at": null
+      }
+    }
+  },
+  "request_help": {
+    "method": "POST",
+    "path": "/v1/sessions/sim_demo_001/events",
+    "body": {
+      "event_id": "evt_001",
+      "session_id": "sim_demo_001",
+      "type": "help_request",
+      "source": "app",
+      "observed_at": "2026-11-14T19:00:00Z",
+      "received_at": "2026-11-14T19:00:00Z",
+      "payload": {
+        "facts": [
+          {
+            "field": "incident.help_requested",
+            "value": true
+          }
+        ]
+      }
+    }
+  },
+  "submit_event": {
+    "method": "POST",
+    "path": "/v1/sessions/sim_demo_001/events",
+    "body": {
+      "event_id": "evt_003",
+      "session_id": "sim_demo_001",
+      "type": "speech_transcript",
+      "source": "operator_report",
+      "observed_at": "2026-11-14T19:00:08Z",
+      "received_at": "2026-11-14T19:00:08Z",
+      "payload": {
+        "transcript": "They are gasping.",
+        "stt_provider": "meta_unity_ai_stt",
+        "is_final": true,
+        "confidence": 0.88
+      }
+    }
+  },
+  "test_call": {
+    "method": "POST",
+    "path": "/v1/sessions/sim_demo_001/calls/test",
+    "headers": {
+      "Idempotency-Key": "sim_demo_001_testcall_001"
+    },
+    "body": {
+      "destination_id": "test_dispatcher",
+      "audio_route": "paired_phone",
+      "simulation_only": true
+    }
+  },
+  "get_summary": {
+    "method": "GET",
+    "path": "/v1/sessions/sim_demo_001/summary"
+  }
+}

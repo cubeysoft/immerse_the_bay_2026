@@ -1,0 +1,67 @@
+{
+  "summary_id": "summary_001",
+  "session_id": "sim_demo_001",
+  "created_at": "2026-11-14T19:00:13Z",
+  "simulation_only": true,
+  "location": {
+    "lat": null,
+    "lon": null,
+    "accuracy_m": null,
+    "source": "operator_report",
+    "captured_at": "2026-11-14T19:00:01Z",
+    "description": "roadside; exact location unconfirmed",
+    "resolution_basis": "operator_report"
+  },
+  "facts": [
+    {
+      "field": "incident.help_requested",
+      "value": true,
+      "source": "app",
+      "certainty": "verified",
+      "observed_at": "2026-11-14T19:00:00Z"
+    },
+    {
+      "field": "patient.breathing",
+      "value": "gasping",
+      "source": "operator_report",
+      "certainty": "reported",
+      "observed_at": "2026-11-14T19:00:08Z"
+    },
+    {
+      "field": "patient.responsive",
+      "value": false,
+      "source": "operator_report",
+      "certainty": "reported",
+      "observed_at": "2026-11-14T19:00:01Z"
+    },
+    {
+      "field": "scene.location_description",
+      "value": "roadside",
+      "source": "operator_report",
+      "certainty": "reported",
+      "observed_at": "2026-11-14T19:00:01Z"
+    }
+  ],
+  "unknown_fields": [],
+  "conflicts": [],
+  "transcripts": [
+    {
+      "event_id": "evt_002",
+      "source": "operator_report",
+      "observed_at": "2026-11-14T19:00:01Z",
+      "text": "I am by the highway. Someone is unconscious.",
+      "stt_provider": "meta_unity_ai_stt",
+      "confidence": 0.92
+    },
+    {
+      "event_id": "evt_003",
+      "source": "operator_report",
+      "observed_at": "2026-11-14T19:00:08Z",
+      "text": "They are gasping.",
+      "stt_provider": "meta_unity_ai_stt",
+      "confidence": 0.88
+    }
+  ],
+  "spoken_text": "Simulated emergency briefing. Emergency assistance requested. Caller reports roadside location; exact address unconfirmed. Bystander reports: unresponsive; gasping.",
+  "note": "Deterministic simulated dispatcher briefing from explicit help, location, and source-labelled reports. Not a medical diagnosis."
+}

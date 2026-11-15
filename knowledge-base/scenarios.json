@@ -1,0 +1,98 @@
+{
+  "purpose": "Dispatcher reporting categories and evidence-collection prompts, not autonomous diagnosis.",
+  "recognition_rule": {
+    "id": "reported_unresponsive_and_abnormal_breathing",
+    "inputs": [
+      "patient.responsive",
+      "patient.breathing"
+    ],
+    "when": "responsive == false AND breathing in [absent, gasping, abnormal]",
+    "label": "possible_cardiac_arrest",
+    "source_ids": [
+      "aha_adult_2025",
+      "aha_pediatric_2025"
+    ],
+    "scope": "reviewed_rules_only; never assume patient age, breathing, or cause"
+  },
+  "scenarios": [
+    {
+      "id": "suspected_cardiac_arrest",
+      "evidence_fields": [
+        "patient.responsive",
+        "patient.breathing"
+      ],
+      "guidance_note": "Use reported unresponsive plus absent/abnormal breathing as a clinical trigger for approved workflow; not a cause diagnosis.",
+      "source_ids": [
+        "aha_adult_2025",
+        "aha_pediatric_2025"
+      ],
+      "assignable_by_llm": false,
+      "classification": "possible_not_confirmed"
+    },
+    {
+      "id": "possible_drowning",
+      "evidence_fields": [
+        "scene.witnessed_submersion",
+        "scene.recovered_from_water"
+      ],
+      "guidance_note": "Do not infer drowning merely from proximity to water.",
+      "source_ids": [
+        "aha_special_2025"
+      ],
+      "assignable_by_llm": false,
+      "classification": "possible_not_confirmed"
+    },
+    {
+      "id": "possible_electrical_injury",
+      "evidence_fields": [
+        "scene.witnessed_electrical_contact",
+        "scene.exposed_electrical_hazard"
+      ],
+      "guidance_note": "Potential live power requires scene safety. Do not infer from an unverified cable.",
+      "source_ids": [
+        "aha_special_2025"
+      ],
+      "assignable_by_llm": false,
+      "classification": "possible_not_confirmed"
+    },
+    {
+      "id": "possible_overdose",
+      "evidence_fields": [
+        "scene.reported_substance_exposure",
+        "scene.witnessed_drug_use"
+      ],
+      "guidance_note": "Do not diagnose opioid overdose from objects, posture or appearance.",
+      "source_ids": [
+        "aha_special_2025"
+      ],
+      "assignable_by_llm": false,
+      "classification": "possible_not_confirmed"
+    },
+    {
+      "id": "possible_smoke_exposure",
+      "evidence_fields": [
+        "scene.reported_smoke_exposure",
+        "scene.visible_smoke"
+      ],
+      "guidance_note": "Environmental evidence only; do not diagnose toxic exposure.",
+      "source_ids": [
+        "aha_special_2025"
+      ],
+      "assignable_by_llm": false,
+      "classification": "possible_not_confirmed"
+    },
+    {
+      "id": "possible_trauma",
+      "evidence_fields": [
+        "scene.witnessed_crash_or_fall",
+        "scene.reported_injury"
+      ],
+      "guidance_note": "Roadside location alone does not establish a crash or traumatic injury.",
+      "source_ids": [
+        "aha_special_2025"
+      ],
+      "assignable_by_llm": false,
+      "classification": "possible_not_confirmed"
+    }
+  ]
+}

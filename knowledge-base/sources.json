@@ -1,0 +1,176 @@
+{
+  "reviewed_for_design_on": "2026-11-14",
+  "sources": [
+    {
+      "id": "aha_adult_2025",
+      "publisher": "American Heart Association",
+      "title": "2025 Adult Basic Life Support",
+      "url": "https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-basic-life-support",
+      "kind": "clinical_guideline",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Design reference. Clinical/device wording requires responsible expert review."
+    },
+    {
+      "id": "aha_pediatric_2025",
+      "publisher": "American Heart Association / American Academy of Pediatrics",
+      "title": "2025 Pediatric Basic Life Support",
+      "url": "https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/pediatric-basic-life-support",
+      "kind": "clinical_guideline",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Design reference. Clinical/device wording requires responsible expert review."
+    },
+    {
+      "id": "aha_special_2025",
+      "publisher": "American Heart Association",
+      "title": "2025 Adult and Pediatric Special Circumstances of Resuscitation",
+      "url": "https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/adult-and-pediatric-special-circumstances-of-resuscitation/",
+      "kind": "clinical_guideline",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Design reference. Clinical/device wording requires responsible expert review."
+    },
+    {
+      "id": "aha_education_2025",
+      "publisher": "American Heart Association",
+      "title": "2025 Resuscitation Education Science",
+      "url": "https://cpr.heart.org/en/resuscitation-science/cpr-and-ecc-guidelines/resuscitation-education-science",
+      "kind": "clinical_guideline",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Design reference. Clinical/device wording requires responsible expert review."
+    },
+    {
+      "id": "redcross_cpr_steps",
+      "publisher": "American Red Cross",
+      "title": "Adult CPR steps",
+      "url": "https://www.redcross.org/take-a-class/cpr/performing-cpr/cpr-steps",
+      "kind": "training_reference",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "redcross_aed_steps",
+      "publisher": "American Red Cross",
+      "title": "AED steps",
+      "url": "https://www.redcross.org/take-a-class/aed/using-an-aed/aed-steps",
+      "kind": "training_reference",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "redcross_training",
+      "publisher": "American Red Cross",
+      "title": "CPR training resources",
+      "url": "https://www.redcross.org/take-a-class/cpr/performing-cpr",
+      "kind": "training_reference",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "us_911_calling",
+      "publisher": "911.gov",
+      "title": "Calling 911",
+      "url": "https://www.911.gov/calling-911/",
+      "kind": "emergency_communications",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "us_911_ng911",
+      "publisher": "911.gov",
+      "title": "Next Generation 911",
+      "url": "https://www.911.gov/issues/ng911/",
+      "kind": "emergency_communications",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "meta_camera",
+      "publisher": "Meta",
+      "title": "Quest Passthrough Camera API Overview",
+      "url": "https://developers.meta.com/vr/documentation/unity/unity-pca-overview/",
+      "kind": "hardware_documentation",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "meta_camera_unity",
+      "publisher": "Meta",
+      "title": "Getting started with the Passthrough Camera API in Unity",
+      "url": "https://developers.meta.com/vr/documentation/unity/unity-pca-documentation/",
+      "kind": "hardware_documentation",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "meta_yolo",
+      "publisher": "Meta",
+      "title": "Multi Object Detection sample",
+      "url": "https://developers.meta.com/vr/documentation/unity/unity-sample-camera-object-detection/",
+      "kind": "developer_documentation",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "meta_inference",
+      "publisher": "Meta",
+      "title": "Unity Inference Engine",
+      "url": "https://developers.meta.com/vr/documentation/unity/unity-ai-unity-inference-engine/",
+      "kind": "developer_documentation",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "meta_ai_building_blocks",
+      "publisher": "Meta",
+      "title": "Unity AI Building Blocks overview",
+      "url": "https://developers.meta.com/vr/documentation/unity/unity-ai-building-blocks-overview/",
+      "kind": "developer_documentation",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Canonical reference for Meta Unity Speech to Text and provider-based AI building blocks."
+    },
+    {
+      "id": "meta_wearables",
+      "publisher": "Meta",
+      "title": "Wearables Developer FAQ",
+      "url": "https://developers.meta.com/wearables/faq/",
+      "kind": "developer_documentation",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "unity_http",
+      "publisher": "Unity",
+      "title": "UnityWebRequest API",
+      "url": "https://docs.unity3d.com/6000.0/Documentation/ScriptReference/Networking.UnityWebRequest.html",
+      "kind": "developer_documentation",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "unity_video",
+      "publisher": "Unity",
+      "title": "VideoPlayer RenderTexture guide",
+      "url": "https://docs.unity3d.com/Manual/VideoPlayer-rendertexture.html",
+      "kind": "developer_documentation",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "aws_api",
+      "publisher": "Amazon Web Services",
+      "title": "Create HTTP API with Lambda and DynamoDB",
+      "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-dynamo-db.html",
+      "kind": "developer_documentation",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    },
+    {
+      "id": "aws_connect",
+      "publisher": "Amazon Web Services",
+      "title": "Amazon Connect StartOutboundVoiceContact",
+      "url": "https://docs.aws.amazon.com/connect/latest/APIReference/API_StartOutboundVoiceContact.html",
+      "kind": "developer_documentation",
+      "clinical_content_permission": "not_assumed",
+      "notes": "Reference only; functionality and use rights are not granted by citation."
+    }
+  ]
+}

@@ -1,0 +1,272 @@
+openapi: 3.0.3
+info:
+  title: XR-AED Simulated Dispatch API
+  version: unreleased
+  description: >
+    Prototype-only API. Calls are restricted to allowlisted test dispatchers.
+    This API does NOT place real emergency calls or guarantee live 911 integration.
+servers:
+  - url: https://api.example.invalid/v1
+    description: Placeholder; replace in your team's staging environment
+security:
+  - bearerAuth: []
+tags:
+  - name: sessions
+  - name: events
+  - name: calls
+  - name: summaries
+paths:
+  /sessions:
+    post:
+      tags: [sessions]
+      summary: Create simulated incident session
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [mode, client_session_id]
+              properties:
+                mode:
+                  type: string
+                  enum: [emergency_simulation]
+                client_session_id:
+                  type: string
+                location:
+                  $ref: '#/components/schemas/Location'
+      responses:
+        '201':
+          description: Session created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [session_id, status]
+                properties:
+                  session_id: {type: string}
+                  status: {type: string, enum: [created]}
+        '400': {description: Invalid request}
+        '401': {description: Unauthorized}
+  /sessions/{sessionId}:
+    get:
+      tags: [sessions]
+      summary: Get current simulated session status
+      operationId: getSession
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Current session state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  session_id: {type: string}
+                  mode: {type: string, enum: [emergency_simulation]}
+                  call_status:
+                    type: string
+                    enum: [not_requested, requested, ringing, connected, ended, failed]
+                  last_event_id: {type: string, nullable: true}
+        '404': {description: Session not found}
+  /sessions/{sessionId}/events:
+    post:
+      tags: [events]
+      summary: Submit a source-labelled event
+      description: >
+        Idempotent by session_id + event_id. Unity supplies final Meta STT transcripts,
+        explicit help requests, authorized location, and optional AED telemetry.
+      operationId: postEvent
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IncidentEvent'
+      responses:
+        '202':
+          description: Accepted or already accepted under the same event ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  event_id: {type: string}
+                  status: {type: string, enum: [accepted, duplicate]}
+        '400': {description: Invalid event}
+        '404': {description: Session not found}
+  /sessions/{sessionId}/calls/test:
+    post:
+      tags: [calls]
+      summary: Request a TEST dispatcher call ONLY
+      operationId: requestTestCall
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: {type: string, minLength: 8, maxLength: 128}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [destination_id, audio_route, simulation_only]
+              properties:
+                destination_id:
+                  type: string
+                  enum: [test_dispatcher]
+                  description: >
+                    Allowlisted logical identifier; resolve to a test phone/contact on the server.
+                    Never accept arbitrary phone numbers from the headset.
+                audio_route:
+                  type: string
+                  enum: [paired_phone, voip_bridge]
+                simulation_only:
+                  type: boolean
+                  enum: [true]
+      responses:
+        '202':
+          description: Call request accepted, not proof that a conversation is connected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  call_id: {type: string}
+                  status: {type: string, enum: [requested]}
+        '403': {description: Destination not allowed}
+        '409': {description: Conflicting call request}
+  /sessions/{sessionId}/summary:
+    get:
+      tags: [summaries]
+      summary: Get a deterministic evidence-labeled briefing
+      operationId: getSummary
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Briefing assembled from accepted events, never free-form diagnosis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DispatcherSummary'
+        '404': {description: Session not found}
+components:
+  parameters:
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema: {type: string}
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Location:
+      type: object
+      additionalProperties: false
+      properties:
+        lat: {type: number, nullable: true, minimum: -90, maximum: 90}
+        lon: {type: number, nullable: true, minimum: -180, maximum: 180}
+        accuracy_m: {type: number, nullable: true, minimum: 0}
+        source:
+          type: string
+          enum: [unknown, companion_phone, headset_service, operator_report, dispatcher_confirmed]
+        captured_at: {type: string, nullable: true, format: date-time}
+        description: {type: string, nullable: true}
+        resolution_basis:
+          type: string
+          enum: [operator_report, geo_inferred, unknown]
+      required: [lat, lon, accuracy_m, source, captured_at]
+    IncidentEvent:
+      type: object
+      additionalProperties: false
+      required: [event_id, session_id, type, source, observed_at, received_at, payload]
+      properties:
+        event_id: {type: string}
+        session_id: {type: string}
+        type:
+          type: string
+          enum: [speech_transcript, help_request, location_update, aed_telemetry, call_status]
+        source:
+          type: string
+          enum: [operator_report, dispatcher_confirmed, companion_phone, phone_server, headset_service, aed_telemetry, app]
+        observed_at: {type: string, format: date-time}
+        received_at: {type: string, format: date-time}
+        payload:
+          type: object
+          description: >
+            Type-specific JSON validated on the server. speech_transcript contains the final
+            Meta STT transcript, provider ID, and is_final=true. The backend adapter extracts
+            proposed facts before passing the event to the reducer; Unity does not send facts.
+    SummaryFact:
+      type: object
+      additionalProperties: false
+      required: [field, value, source, certainty, observed_at]
+      properties:
+        field: {type: string}
+        value: {nullable: true}
+        source:
+          type: string
+          enum: [operator_report, dispatcher_confirmed, aed_telemetry, app]
+        certainty: {type: string, enum: [reported, observed_unverified, verified, unknown]}
+        observed_at: {type: string, format: date-time, nullable: true}
+    DispatcherSummary:
+      type: object
+      required: [summary_id, session_id, created_at, simulation_only, location, facts, unknown_fields, conflicts, transcripts, spoken_text, note]
+      properties:
+        summary_id: {type: string}
+        session_id: {type: string}
+        created_at: {type: string, format: date-time}
+        simulation_only: {type: boolean, enum: [true]}
+        location: {$ref: '#/components/schemas/Location'}
+        facts:
+          type: array
+          items: {$ref: '#/components/schemas/SummaryFact'}
+        unknown_fields:
+          type: array
+          items: {type: string}
+        transcripts:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [event_id, source, observed_at, text, stt_provider, confidence]
+            properties:
+              event_id: {type: string}
+              source: {type: string, enum: [operator_report, dispatcher_confirmed]}
+              observed_at: {type: string, format: date-time}
+              text: {type: string}
+              stt_provider: {type: string}
+              confidence: {type: number, nullable: true, minimum: 0, maximum: 1}
+        conflicts:
+          type: array
+          description: Accepted reports that disagree on the same field.
+          items:
+            type: object
+            additionalProperties: false
+            required: [field, previous_value, previous_source, previous_event_id, incoming_value, incoming_source, incoming_event_id]
+            properties:
+              field: {type: string}
+              previous_value: {nullable: false}
+              previous_source: {type: string}
+              previous_event_id: {type: string}
+              incoming_value: {nullable: false}
+              incoming_source: {type: string}
+              incoming_event_id: {type: string}
+        spoken_text:
+          type: string
+          description: >
+            Deterministic spoken briefing for simulated telephony read-back. Starts with
+            explicit help status and operator-reported or authorized device location.
+        note: {type: string}

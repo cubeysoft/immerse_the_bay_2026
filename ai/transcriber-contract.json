@@ -1,0 +1,68 @@
+{
+  "input": {
+    "event_type": "speech_transcript",
+    "description": "A final transcript supplied by Meta Unity AI Speech to Text. This project does not transcribe audio.",
+    "required_payload_fields": [
+      "transcript",
+      "stt_provider",
+      "is_final"
+    ],
+    "human_sources": [
+      "operator_report",
+      "dispatcher_confirmed"
+    ]
+  },
+  "permitted_fact_fields": [
+    "incident.help_requested",
+    "patient.age_group",
+    "patient.approximate_age",
+    "patient.sex",
+    "patient.responsive",
+    "patient.breathing",
+    "scene.location_description",
+    "scene.reported_injury",
+    "scene.witnessed_submersion",
+    "scene.recovered_from_water",
+    "scene.reported_substance_exposure",
+    "scene.witnessed_drug_use",
+    "scene.witnessed_electrical_contact",
+    "scene.exposed_electrical_hazard",
+    "scene.reported_smoke_exposure",
+    "scene.visible_smoke",
+    "scene.witnessed_crash_or_fall",
+    "response.cpr_started",
+    "aed.available",
+    "aed.powered_on",
+    "aed.pads_attached"
+  ],
+  "fact_value_domains": {
+    "incident.help_requested": {"type": "boolean"},
+    "patient.age_group": ["infant", "child", "adolescent", "adult"],
+    "patient.approximate_age": {"type": "integer", "minimum": 0, "maximum": 130},
+    "patient.sex": ["male", "female", "other"],
+    "patient.responsive": [true, false, "uncertain"],
+    "patient.breathing": ["normal", "absent", "gasping", "abnormal", "uncertain"],
+    "scene.location_description": {"type": "string", "minLength": 1, "maxLength": 300},
+    "scene.reported_injury": {"type": "string", "minLength": 1, "maxLength": 300},
+    "scene.reported_substance_exposure": {"type": "string", "minLength": 1, "maxLength": 200},
+    "scene.witnessed_submersion": {"type": "boolean"},
+    "scene.recovered_from_water": {"type": "boolean"},
+    "scene.witnessed_drug_use": {"type": "boolean"},
+    "scene.witnessed_electrical_contact": {"type": "boolean"},
+    "scene.exposed_electrical_hazard": {"type": "boolean"},
+    "scene.reported_smoke_exposure": {"type": "boolean"},
+    "scene.visible_smoke": {"type": "boolean"},
+    "scene.witnessed_crash_or_fall": {"type": "boolean"},
+    "response.cpr_started": {"type": "boolean"},
+    "aed.available": {"type": "boolean"},
+    "aed.powered_on": {"type": "boolean"},
+    "aed.pads_attached": {"type": "boolean"}
+  },
+  "forbidden_output_fields": [
+    "patient.cardiac_rhythm",
+    "patient.pulse_absent",
+    "patient.confirmed_diagnosis",
+    "aed.shock_indicated",
+    "aed.shock_authorized"
+  ]
+}

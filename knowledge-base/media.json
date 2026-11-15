@@ -1,0 +1,209 @@
+{
+  "policy": {
+    "mode": "training_by_default",
+    "available_when": "application_running_and_media_available",
+    "always_on_demand_non_emergency": true,
+    "emergency_interrupts_training": true,
+    "emergency_full_videos": false,
+    "download_for_offline_before_use": true,
+    "approved_media_only": true,
+    "training_is_not_certification": true
+  },
+  "lessons": [
+    {
+      "id": "adult_cpr",
+      "title": "Adult CPR",
+      "patient_group": "adult",
+      "clinical_entry_ids": [
+        "assess.response",
+        "assess.breath",
+        "help.call",
+        "cpr.adult.hands",
+        "cpr.rate",
+        "cpr.adult.depth"
+      ],
+      "full_video_id": "adult_cpr_full",
+      "step_clip_ids": [
+        "adult_hand_position",
+        "adult_compressions"
+      ],
+      "training_only": true
+    },
+    {
+      "id": "child_cpr",
+      "title": "Child CPR",
+      "patient_group": "child",
+      "clinical_entry_ids": [
+        "assess.response",
+        "assess.breath",
+        "help.call",
+        "cpr.child.position",
+        "cpr.child.depth",
+        "cpr.pediatric.breaths"
+      ],
+      "full_video_id": "child_cpr_full",
+      "step_clip_ids": [
+        "child_compressions",
+        "child_breaths"
+      ],
+      "training_only": true
+    },
+    {
+      "id": "infant_cpr",
+      "title": "Infant CPR",
+      "patient_group": "infant",
+      "clinical_entry_ids": [
+        "assess.response",
+        "assess.breath",
+        "help.call",
+        "cpr.infant.position",
+        "cpr.infant.depth",
+        "cpr.pediatric.breaths"
+      ],
+      "full_video_id": "infant_cpr_full",
+      "step_clip_ids": [
+        "infant_compressions",
+        "infant_breaths"
+      ],
+      "training_only": true
+    },
+    {
+      "id": "aed_basics",
+      "title": "AED Basics",
+      "patient_group": "adult",
+      "clinical_entry_ids": [
+        "aed.power",
+        "aed.pads",
+        "aed.clear",
+        "aed.resume"
+      ],
+      "full_video_id": "aed_basics_full",
+      "step_clip_ids": [
+        "aed_pads",
+        "aed_clear"
+      ],
+      "training_only": true
+    }
+  ],
+  "assets": {
+    "adult_cpr_full": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "adult_hand_position": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "adult_compressions": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "child_cpr_full": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "child_compressions": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "child_breaths": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "infant_cpr_full": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "infant_compressions": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "infant_breaths": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "aed_basics_full": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "aed_pads": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    },
+    "aed_clear": {
+      "local_path": null,
+      "format": "mp4_h264_aac",
+      "status": "missing_asset",
+      "rights": "not_cleared",
+      "clinical_approval": "not_approved",
+      "emergency_playback_allowed": false
+    }
+  },
+  "external_training_references": [
+    {
+      "id": "redcross_training",
+      "url": "https://www.redcross.org/take-a-class/cpr/performing-cpr",
+      "status": "reference_only_not_bundled"
+    },
+    {
+      "id": "redcross_aed_steps",
+      "url": "https://www.redcross.org/take-a-class/aed/using-an-aed/aed-steps",
+      "status": "reference_only_not_bundled"
+    }
+  ],
+  "controls": [
+    "play_lesson",
+    "play_step",
+    "pause",
+    "resume",
+    "replay_step",
+    "next_step",
+    "set_speed",
+    "close"
+  ],
+  "note": "No clips are included. Do not copy, clip or embed third-party footage without rights and updated clinical review."
+}

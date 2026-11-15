@@ -1,0 +1,30 @@
+{
+  "responses": {
+    "unknown_clinical": {
+      "message": "I do not have verified instructions for that. Follow the dispatcher and AED prompts.",
+      "emergency_allowed_after_review": false
+    },
+    "unclear_audio": {
+      "message": "Please repeat that if you can.",
+      "emergency_allowed_after_review": false
+    },
+    "out_of_scope": {
+      "message": "This assistant only supports CPR training and emergency information.",
+      "emergency_allowed_after_review": false
+    },
+    "model_unavailable": {
+      "message": "AI assistance is unavailable. The dispatcher call and AED can continue independently.",
+      "emergency_allowed_after_review": false
+    },
+    "training_media_missing": {
+      "message": "This training clip is not available on this device.",
+      "emergency_allowed_after_review": false
+    }
+  },
+  "rules": [
+    "No general-answer fallback or open-web search during an incident.",
+    "Do not invent medical facts or confirmed diagnoses.",
+    "Do not interrupt or talk over dispatcher/AED prompts.",
+    "Fallback wording is a design draft requiring clinical and human-factors approval."
+  ]
+}

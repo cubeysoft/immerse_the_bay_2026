@@ -1,0 +1,216 @@
+{
+  "cases": [
+    {
+      "input": "Someone collapsed!",
+      "expected_facts": {}
+    },
+    {
+      "input": "They are gasping",
+      "expected_facts": {"patient.breathing": "gasping"}
+    },
+    {
+      "input": "I do not think they are breathing",
+      "expected_facts": {"patient.breathing": "uncertain"}
+    },
+    {
+      "input": "The AED pads are on",
+      "expected_facts": {"aed.pads_attached": true}
+    },
+    {
+      "input": "Who won the game?",
+      "expected_facts": {}
+    },
+    {
+      "input": "Is this patient in ventricular fibrillation?",
+      "expected_facts": {},
+      "expected_unresolved": ["question_not_fact"]
+    },
+    {
+      "input": "I am on a highway and someone is unconscious",
+      "expected_facts": {
+        "patient.responsive": false,
+        "scene.location_description": "roadside"
+      }
+    },
+    {
+      "input": "What do I do if somebody is gasping?",
+      "expected_facts": {},
+      "expected_unresolved": ["question_not_fact"]
+    },
+    {
+      "input": "Tell the dispatcher that the person is an adult",
+      "expected_facts": {"patient.age_group": "adult"}
+    },
+    {
+      "input": "This is an adult male, unconscious, breathing normally",
+      "expected_facts": {
+        "patient.age_group": "adult",
+        "patient.sex": "male",
+        "patient.responsive": false,
+        "patient.breathing": "normal"
+      }
+    },
+    {
+      "input": "She is an elderly woman, about 70 years old, awake and breathing normally",
+      "expected_facts": {
+        "patient.age_group": "adult",
+        "patient.sex": "female",
+        "patient.approximate_age": 70,
+        "patient.responsive": true,
+        "patient.breathing": "normal"
+      }
+    },
+    {
+      "input": "It is a 6 year old boy, unresponsive and not breathing",
+      "expected_facts": {
+        "patient.age_group": "child",
+        "patient.sex": "male",
+        "patient.approximate_age": 6,
+        "patient.responsive": false,
+        "patient.breathing": "absent"
+      }
+    },
+    {
+      "input": "We are at 450 Serra Mall near the main quad",
+      "expected_facts": {
+        "scene.location_description": "450 Serra Mall near the main quad"
+      }
+    },
+    {
+      "input": "I started chest compressions",
+      "expected_facts": {"response.cpr_started": true}
+    },
+    {
+      "input": "He has a bleeding head injury from a fall",
+      "expected_facts": {
+        "scene.reported_injury": "bleeding head injury",
+        "scene.witnessed_crash_or_fall": true
+      }
+    },
+    {
+      "input": "He is not unconscious and is breathing normally",
+      "expected_facts": {
+        "patient.responsive": true,
+        "patient.breathing": "normal"
+      }
+    },
+    {
+      "input": "He was unconscious but is awake now",
+      "expected_facts": {"patient.responsive": true}
+    },
+    {
+      "input": "He is not gasping anymore, breathing normally",
+      "expected_facts": {"patient.breathing": "normal"}
+    },
+    {
+      "input": "I do not know if he is breathing",
+      "expected_facts": {"patient.breathing": "uncertain"}
+    },
+    {
+      "input": "The 14 year old is unresponsive and gasping",
+      "expected_facts": {
+        "patient.approximate_age": 14,
+        "patient.age_group": "adolescent",
+        "patient.responsive": false,
+        "patient.breathing": "gasping"
+      }
+    },
+    {
+      "input": "The one year old is unresponsive and not breathing",
+      "expected_facts": {
+        "patient.approximate_age": 1,
+        "patient.age_group": "child",
+        "patient.responsive": false,
+        "patient.breathing": "absent"
+      }
+    },
+    {
+      "input": "A man said the patient is a woman",
+      "expected_facts": {"patient.sex": "female"}
+    },
+    {
+      "input": "There is a man helping the female patient",
+      "expected_facts": {"patient.sex": "female"}
+    },
+    {
+      "input": "We have no AED",
+      "expected_facts": {"aed.available": false}
+    },
+    {
+      "input": "The AED pads are not attached",
+      "expected_facts": {"aed.pads_attached": false}
+    },
+    {
+      "input": "Do not start CPR",
+      "expected_facts": {}
+    },
+    {
+      "input": "We stopped chest compressions but restarted them",
+      "expected_facts": {"response.cpr_started": true}
+    },
+    {
+      "input": "We are at 450 Serra Mall, and he is unconscious",
+      "expected_facts": {
+        "scene.location_description": "450 Serra Mall",
+        "patient.responsive": false
+      }
+    },
+    {
+      "input": "He was pulled from the water and is not breathing",
+      "expected_facts": {
+        "scene.recovered_from_water": true,
+        "scene.witnessed_submersion": true,
+        "patient.breathing": "absent"
+      }
+    },
+    {
+      "input": "She overdosed and is unresponsive, barely breathing",
+      "expected_facts": {
+        "scene.reported_substance_exposure": "overdosed",
+        "patient.responsive": false,
+        "patient.breathing": "abnormal"
+      }
+    },
+    {
+      "input": "He touched a live wire and is unresponsive",
+      "expected_facts": {
+        "scene.witnessed_electrical_contact": true,
+        "scene.exposed_electrical_hazard": true,
+        "patient.responsive": false
+      }
+    },
+    {
+      "input": "There is visible smoke and the patient is gasping",
+      "expected_facts": {
+        "scene.visible_smoke": true,
+        "scene.reported_smoke_exposure": true,
+        "patient.breathing": "gasping"
+      }
+    },
+    {
+      "input": "Two patients are unconscious and one is gasping",
+      "expected_facts": {},
+      "expected_unresolved": ["multiple_patients"]
+    },
+    {
+      "input": "The patient is awake and breathing normally",
+      "source": "dispatcher_confirmed",
+      "expected_facts": {
+        "patient.responsive": true,
+        "patient.breathing": "normal"
+      }
+    },
+    {
+      "input": "Is he gasping?",
+      "source": "dispatcher_confirmed",
+      "expected_facts": {},
+      "expected_unresolved": ["question_not_fact"]
+    },
+    {
+      "input": "Are they unconscious",
+      "source": "dispatcher_confirmed",
+      "expected_facts": {},
+      "expected_unresolved": ["question_not_fact"]
+    }
+  ]
+}

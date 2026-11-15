@@ -1,0 +1,55 @@
+{
+  "cases": [
+    {
+      "id": "help_and_geo_without_speech",
+      "inputs": [
+        "explicit help button",
+        "authorized companion phone location",
+        "Meta STT unavailable"
+      ],
+      "expected": [
+        "call request remains available",
+        "spoken_text says emergency assistance requested",
+        "spoken_text includes device location and accuracy",
+        "patient details remain unknown"
+      ]
+    },
+    {
+      "id": "help_and_operator_location",
+      "inputs": [
+        "explicit help button",
+        "Meta STT final transcript: We are at 450 Serra Mall and someone is unconscious"
+      ],
+      "expected": [
+        "raw transcript retained",
+        "operator location takes precedence",
+        "unresponsive is labelled operator-reported"
+      ]
+    },
+    {
+      "id": "distressed_correction",
+      "inputs": [
+        "Meta STT final transcript: He is breathing normally",
+        "Meta STT final transcript: No, he is gasping"
+      ],
+      "expected": [
+        "both transcripts retained",
+        "gasping is current",
+        "spoken_text discloses the changed breathing report"
+      ]
+    },
+    {
+      "id": "twilio_test_call",
+      "inputs": [
+        "validated session summary",
+        "allowlisted destination_id=test_dispatcher",
+        "idempotency key"
+      ],
+      "expected": [
+        "Twilio receives deterministic spoken_text",
+        "requested is not treated as connected",
+        "duplicate request does not place another call"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "project": "xr-aed",
+  "region": "US",
+  "audience": "untrained_bystander",
+  "status": "prototype_draft",
+  "clinical_baseline": "AHA/AAP 2025 guidelines",
+  "clinical_approval": {
+    "status": "not_approved",
+    "reviewer": null,
+    "reviewed_at": null
+  },
+  "safety_policy": {
+    "dispatcher_first": true,
+    "emergency_call_model_independent": true,
+    "clinical_generation_allowed": false,
+    "clinical_response_playback_enabled": false,
+    "no_aed_shock_control": true,
+    "live_media_while_emergency": false,
+    "normal_training_media_available": true,
+    "no_default_patient_age_or_breathing": true
+  },
+  "files": {
+    "clinical": "clinical.json",
+    "scenarios": "scenarios.json",
+    "sources": "sources.json",
+    "device": "device.json",
+    "media": "media.json",
+    "fallback": "fallback.json"
+  },
+  "note": "The local KB is a source-backed draft; do not activate unapproved treatment prompts in an actual emergency."
+}

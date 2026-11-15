@@ -1,0 +1,94 @@
+{
+  "cases": [
+    {
+      "id": "help_is_explicit",
+      "given": "A transcript describes an emergency but no help button event exists",
+      "assert": "incident.help_requested remains unknown and spoken_text says help request not confirmed"
+    },
+    {
+      "id": "help_survives_stt_failure",
+      "given": "The app emits help_request but Meta STT returns no final transcript",
+      "assert": "spoken_text still says emergency assistance requested"
+    },
+    {
+      "id": "final_transcripts_only",
+      "given": "Meta STT emits an interim transcript",
+      "assert": "reject it; only is_final=true transcripts enter incident history"
+    },
+    {
+      "id": "raw_transcript_retained",
+      "given": "A final Meta STT transcript is accepted",
+      "assert": "retain its exact text, provider, confidence, speaker and timestamp"
+    },
+    {
+      "id": "unknown_not_false",
+      "given": "No breathing report exists",
+      "assert": "breathing remains unknown rather than absent"
+    },
+    {
+      "id": "location_priority",
+      "given": "Operator location and authorized device coordinates are available",
+      "assert": "spoken_text uses the operator location; otherwise it uses device coordinates and accuracy"
+    },
+    {
+      "id": "no_bad_geo",
+      "given": "Location comes from IP geolocation or invalid coordinates",
+      "assert": "reject it and never present it as patient location"
+    },
+    {
+      "id": "invalid_fact_domain_rejected",
+      "given": "A transcript proposes patient.breathing=banana or a negative age",
+      "assert": "reject the event before context reduction"
+    },
+    {
+      "id": "cross_session_event_rejected",
+      "given": "An event session_id differs from the context session_id",
+      "assert": "reject it without mutating history"
+    },
+    {
+      "id": "source_authority_enforced",
+      "given": "Speech attempts to set incident.help_requested or app help attempts to set patient status",
+      "assert": "reject the source/type/field combination"
+    },
+    {
+      "id": "duplicate_event",
+      "given": "The same event_id is retried",
+      "assert": "accept identical content idempotently and reject changed content"
+    },
+    {
+      "id": "arrival_order_independent",
+      "given": "The same events arrive in different network order",
+      "assert": "current facts and normalized conflicts are identical"
+    },
+    {
+      "id": "conflict_disclosed",
+      "given": "Normal breathing is reported and a later report says gasping",
+      "assert": "retain both transcripts, use the later report and disclose the conflict"
+    },
+    {
+      "id": "spoken_provenance_preserved",
+      "given": "The dispatcher confirms a fact after an operator report",
+      "assert": "spoken_text attributes the current fact to the dispatcher"
+    },
+    {
+      "id": "multiple_patients_not_merged",
+      "given": "One transcript describes multiple patients without stable identifiers",
+      "assert": "mark multiple_patients unresolved and do not merge patient facts"
+    },
+    {
+      "id": "dispatcher_question_not_fact",
+      "given": "The dispatcher asks whether the patient is unconscious or gasping",
+      "assert": "mark the transcript as a question and do not update incident facts"
+    },
+    {
+      "id": "call_model_independent",
+      "given": "Fact extraction is unavailable",
+      "assert": "explicit help, location and test-call paths remain usable"
+    },
+    {
+      "id": "call_simulation_only",
+      "given": "A client submits a real emergency number",
+      "assert": "reject it; resolve only the server-side test_dispatcher destination"
+    }
+  ]
+}

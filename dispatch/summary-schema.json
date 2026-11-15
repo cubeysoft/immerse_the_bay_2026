@@ -1,0 +1,238 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/xr-aed/dispatcher-summary.schema.json",
+  "title": "Simulated dispatcher evidence-labeled summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "summary_id",
+    "session_id",
+    "created_at",
+    "simulation_only",
+    "facts",
+    "unknown_fields",
+    "conflicts",
+    "transcripts",
+    "spoken_text",
+    "note"
+  ],
+  "properties": {
+    "summary_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "simulation_only": {
+      "const": true
+    },
+    "location": {
+      "type": [
+        "object",
+        "null"
+      ],
+      "properties": {
+        "lat": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "lon": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "accuracy_m": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "source": {
+          "type": "string",
+          "enum": [
+            "operator_report",
+            "dispatcher_confirmed",
+            "companion_phone",
+            "headset_service",
+            "unknown"
+          ]
+        },
+        "captured_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "resolution_basis": {
+          "type": "string",
+          "enum": [
+            "operator_report",
+            "geo_inferred",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "lat",
+        "lon",
+        "accuracy_m",
+        "source",
+        "captured_at"
+      ],
+      "additionalProperties": false
+    },
+    "facts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "field",
+          "value",
+          "source",
+          "certainty",
+          "observed_at"
+        ],
+        "properties": {
+          "field": {
+            "type": "string",
+            "enum": [
+              "incident.help_requested",
+              "patient.age_group",
+              "patient.approximate_age",
+              "patient.sex",
+              "patient.responsive",
+              "patient.breathing",
+              "scene.location_description",
+              "scene.reported_injury",
+              "scene.witnessed_submersion",
+              "scene.recovered_from_water",
+              "scene.reported_substance_exposure",
+              "scene.witnessed_drug_use",
+              "scene.witnessed_electrical_contact",
+              "scene.witnessed_crash_or_fall",
+              "scene.exposed_electrical_hazard",
+              "scene.reported_smoke_exposure",
+              "scene.visible_smoke",
+              "response.cpr_started",
+              "aed.available",
+              "aed.powered_on",
+              "aed.pads_attached"
+            ]
+          },
+          "value": {
+            "type": [
+              "string",
+              "number",
+              "boolean",
+              "null"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "operator_report",
+              "dispatcher_confirmed",
+              "aed_telemetry",
+              "app"
+            ]
+          },
+          "certainty": {
+            "type": "string",
+            "enum": [
+              "reported",
+              "observed_unverified",
+              "verified",
+              "unknown"
+            ]
+          },
+          "observed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "unknown_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "transcripts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "event_id",
+          "source",
+          "observed_at",
+          "text",
+          "stt_provider",
+          "confidence"
+        ],
+        "properties": {
+          "event_id": {"type": "string"},
+          "source": {
+            "type": "string",
+            "enum": ["operator_report", "dispatcher_confirmed"]
+          },
+          "observed_at": {"type": "string", "format": "date-time"},
+          "text": {"type": "string", "minLength": 1},
+          "stt_provider": {"type": "string", "minLength": 1},
+          "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+        }
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "field",
+          "previous_value",
+          "previous_source",
+          "previous_event_id",
+          "incoming_value",
+          "incoming_source",
+          "incoming_event_id"
+        ],
+        "properties": {
+          "field": {"type": "string"},
+          "previous_value": {"type": ["string", "number", "boolean"]},
+          "previous_source": {"type": "string"},
+          "previous_event_id": {"type": "string"},
+          "incoming_value": {"type": ["string", "number", "boolean"]},
+          "incoming_source": {"type": "string"},
+          "incoming_event_id": {"type": "string"}
+        }
+      }
+    },
+    "spoken_text": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Deterministic spoken read-back for simulated dispatch. Must never reference the camera or CV pipeline."
+    },
+    "note": {
+      "type": "string"
+    }
+  }
+}
