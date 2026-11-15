@@ -220,6 +220,20 @@ def _conflict_clauses(context):
     return clauses
 
 
+def _dispatcher_quotes(context):
+    quotes = []
+    for event in context["event_history"]:
+        if event["type"] != "speech_transcript" or event["source"] != "dispatcher_confirmed":
+            continue
+        text = event["payload"]["transcript"].strip()
+        if not text:
+            continue
+        if text[-1] not in ".!?":
+            text = f"{text}."
+        quotes.append(f'Dispatcher said: "{text}"')
+    return quotes
+
+
 def _transcripts(context):
     transcripts = []
     for event in context["event_history"]:
@@ -335,6 +349,7 @@ def compose_summary(context, summary_id="summary_001", created_at="2026-11-14T19
     spoken_parts.extend(_scene_clauses(facts))
     spoken_parts.extend(_conflict_clauses(context))
     spoken_parts.extend(_intervention_clauses(facts))
+    spoken_parts.extend(_dispatcher_quotes(context))
 
     summary = {
         "summary_id": summary_id,

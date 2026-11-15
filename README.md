@@ -1,29 +1,86 @@
-# XR-AED — dispatcher-first prototype starter
+# XR-AED
 
-**Runtime boundary:** Meta Unity AI Speech to Text produces final transcripts. This repository validates transcript-derived facts, combines explicit help and authorized location, and formats a deterministic briefing for an AWS/Twilio test-call adapter.
+This repository takes a finished transcript and keeps two results: the exact words, and a short spoken briefing for a simulated dispatcher.
 
-## Status
+A laptop can also turn a wav file or a microphone clip into that transcript. The Quest app is what hears the headset. This code starts once the words exist. It pulls out a few explicit facts, such as “unconscious” or “gasping,” and quotes the dispatcher’s own sentences in the briefing.
 
-This is a **design and JSON prototype**, not a Unity project, hosted AWS service, trained LLM/CV model, playable media collection, medically approved CPR script, or live emergency-response application. No test call or video stream will run simply by opening these files.
+## Run it on a new machine
 
-## Folders
-
-- `knowledge-base/`: manifest, sources, clinical candidate responses, scenario evidence categories, temporary device profile, training lessons/asset placeholders and fallbacks.
-- `ai/`: Meta STT input and permitted transcriber fact contract.
-- `runtime/`: example Meta STT/help/location events and separate media-player state.
-- `dispatch/`: fixed/evidence-based summary schema and example.
-- `api/`: proposed OpenAPI contract and example HTTP requests.
-- `tests/`: routing, safety and end-to-end simulation cases.
-- `docs/`: team integration handoff, checklist and clinical review log.
-- `scripts/`: conservative fact extraction, event validation/reduction, dispatcher formatting and checks.
-
-## Quick checks
+You need Python 3 and a terminal opened in this folder. These two commands use only the Python standard library.
 
 ```bash
 python3 scripts/validate.py
 python3 scripts/summarize.py
 ```
 
-See `RUNBOOK.md` for the current input/output boundaries, expected results, and teammate handoff.
+`validate.py` should end with:
 
-**Safety:** Do not connect this prototype to actual emergency numbers. The `calls/test` endpoint permits only a server-resolved allowlisted `test_dispatcher`. All clinical entries are drafts and are disabled for emergency playback. Do not promote unvalidated CV observations to medical diagnoses; do not depend on the SLM to initiate calls or control an AED.
+```text
+PASS: Meta STT boundary, 36 exact transcript cases, explicit help, location fallback, event rejection, provenance and Twilio briefing.
+IMPORTANT: This is not an STT accuracy test, clinical approval, API integration test, or proof of headset performance.
+```
+
+That checks the sample transcripts, fact rules, and briefing text. It does not listen to a microphone or contact a phone network.
+
+`summarize.py` prints two sample briefings. The first is a roadside report of someone unresponsive and gasping. The second uses a device location and an adult who is unresponsive and breathing normally.
+
+## Transcribe a recording on this computer
+
+This step is optional. Use it to try operator and dispatcher audio before the Quest microphone is connected.
+
+```bash
+python3 -m pip install -r requirements-audio.txt
+```
+
+The first transcription downloads an English speech model, about 460 MB, and stores it outside this folder.
+
+Label the person wearing the headset as the operator:
+
+```bash
+python3 scripts/transcribe_audio.py operator.wav --source operator_report
+```
+
+After the dispatcher is on the line, transcribe that audio separately:
+
+```bash
+python3 scripts/transcribe_audio.py dispatcher.wav --source dispatcher_confirmed
+```
+
+Or record this computer’s microphone for 8 seconds. `--seconds` can be from 1 to 60. macOS may ask for microphone permission.
+
+```bash
+python3 scripts/transcribe_audio.py --mic --seconds 8 --source operator_report
+```
+
+Each command adds one line to `runtime/session.json` and prints the briefing. `--source` is who spoke. The program does not decide that from the sound. Run it again on another clip to add another line. Delete `runtime/session.json` to start over.
+
+Print a saved session again with:
+
+```bash
+python3 scripts/summarize.py runtime/session.json
+```
+
+Operator sentences become short fact lines when the rules recognize them. A dispatcher sentence is also repeated, including instructions that match no fact, for example: `Dispatcher said: "Push hard in the center of the chest."`
+
+## What this folder does not run
+
+- Putting on a Quest does not start this program. There is no Unity project here.
+- The camera is not read, and video is not summarized.
+- CPR clips are not played. `knowledge-base/media.json` lists clip names, and the video files are absent. Clinical text in `knowledge-base/clinical.json` is draft-only and turned off.
+- No phone call is placed. `api/openapi.yaml` describes a future test-call API. Nothing in this folder listens for HTTP requests, dials Twilio, or contacts 911.
+- The briefing does not invent medical instructions. It repeats recognized facts and the dispatcher’s own words.
+
+Later, the Quest app sends finished text into this same path. Headset speech is `operator_report`. Dispatcher speech, once that call audio can be heard, is `dispatcher_confirmed`. The event shape and the Unity, AWS, and Twilio split are in `RUNBOOK.md` and `docs/TEAM_HANDOFF.md`.
+
+## Where to look
+
+- `scripts/`: fact extraction, incident state, the spoken briefing, checks, and the optional recording transcriber.
+- `runtime/events.example.json`: the sample incident behind the first briefing.
+- `dispatch/`: the briefing format.
+- `api/`: the proposed HTTP contract. It is not a running service.
+- `knowledge-base/`: draft clinical text, media placeholders, and sources.
+- `RUNBOOK.md`: expected command output and the live input and output boundary.
+
+## Safety
+
+Keep this prototype off real emergency numbers. A future test call is limited to an allowlisted `test_dispatcher`. Clinical text and CPR media stay off until a reviewer approves them. Camera observations stay out of the briefing.

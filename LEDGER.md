@@ -4,6 +4,8 @@
 - 2026-11-14 [CODE] Runtime begins after Meta Unity AI Speech to Text. `scripts/transcriber.py` extracts conservative facts from final transcripts, `scripts/incident.py` validates/reduces explicit help, transcript, location, AED and call events, and `scripts/dispatcher.py` creates deterministic `spoken_text` for Twilio.
 - 2026-11-14 [CODE] `ai/transcriber-contract.json`, `dispatch/summary-schema.json`, and `api/openapi.yaml` define the Unity → AWS boundary. Raw final transcripts are retained with speaker, provider, confidence and timestamp.
 - 2026-11-14 [CODE] Unity Meta STT integration, AWS API Gateway/Lambda/DynamoDB endpoints, and Twilio outbound test-call adapter remain unbuilt.
+- 2026-11-14 [CODE] A laptop can transcribe one recording before Quest audio exists. `scripts/transcribe_audio.py` uses faster-whisper `small.en` and appends a final `speech_transcript`. `scripts/dispatcher.py` quotes dispatcher lines in `spoken_text`.
+- 2026-11-14 [CODE] `README.md` is the first-use page: what the repo does, the commands that run on a new machine, and what still requires Quest, video, or a phone service. `RUNBOOK.md` keeps the longer command and integration detail.
 
 ## Implemented
 - 2026-11-14 [CODE] Removed runtime intent/media/clinical-question routing, local STT assumptions, CV background handling, medical recognition flags, `ai/intents.json`, `ai/router-config.json`, and the redundant derived `runtime/context.example.json`.
@@ -14,15 +16,19 @@
 - 2026-11-14 [CODE] Removed redundant `scene.roadside`, `response.help_called`, `operator_confirmed` and `inferred_place` state. Roadside is represented by `scene.location_description`; explicit help uses only `incident.help_requested`; location provenance comes from `source`.
 - 2026-11-14 [CODE] Added `RUNBOOK.md` with the commands that work now, expected results, live input/output boundaries, and Unity/AWS/Twilio integration responsibilities. `README.md` links to it.
 - 2026-11-14 [CODE] Removed server-derived `facts` from the example Unity event request and clarified in `api/openapi.yaml` that the future backend adapter owns transcript extraction before reduction.
+- 2026-11-14 [CODE] Added `requirements-audio.txt`, `scripts/session.py`, and `scripts/transcribe_audio.py`. A wav or microphone clip becomes one final transcript event. `scripts/summarize.py` can print a session file. Dispatcher transcripts are quoted in `spoken_text`, including instructions that match no fact.
+- 2026-11-14 [CODE] Rewrote `README.md` in plain language for teammates: transcript-to-briefing behavior, first-use commands from `RUNBOOK.md`, and the Quest, camera, CPR-media, and phone-call limits.
 
 ## Decisions and blockers
-- 2026-11-14 [USER] Meta Unity AI Speech to Text owns audio transcription; this runtime must keep only the downstream transcript-to-call work.
+- 2026-11-14 [USER] The product goal is a summary of camera video plus operator and dispatcher voice. The first Quest slice is audio only: at call start, transcribe and summarize the operator; once the dispatcher is on the line, keep listening and retain that speech in the transcript and summary. Camera frames stay out of this slice.
+- 2026-11-14 [USER] Meta Unity AI Speech to Text owns audio transcription; this runtime must keep only the downstream transcript-to-call work. Quest labels who spoke. This repo starts at the final transcript.
 - 2026-11-14 [CODE] Help is explicit app state, never inferred from speech or an LLM. Location comes from operator speech or authorized `companion_phone` / `headset_service` coordinates, never CV background or IP geolocation.
 - 2026-11-14 [CODE] Vision remains a separate teammate integration and is not part of the transcript-to-Twilio event contract.
 - 2026-11-14 [CODE] The deterministic extractor is intentionally conservative, not general language understanding. Unsupported or multi-patient language stays unresolved; production still requires an ASR/noise/accents corpus and a constrained extraction fallback evaluated against it.
 - 2026-11-14 [CODE] The live Unity payload contains final transcript metadata, not trusted patient facts. Server-side extraction must preserve the raw text and attach proposed facts before `incident.py` reduces the event.
 - 2026-11-14 [ASSUMPTION] Session audio path uses an allowlisted Twilio test call on a paired phone (`destination_id: "test_dispatcher"`, `simulation_only: true`); real 911 remains out of scope.
 - 2026-11-14 [CODE] Clinical guidance entries remain unapproved (`docs/CLINICAL_REVIEW_LOG.md`); emergency clinical playback stays disabled.
+- 2026-11-14 [CODE] Laptop speech recognition is faster-whisper English `small` on CPU int8. The caller passes `operator_report` or `dispatcher_confirmed`. Quest still uses Meta speech-to-text for the same event. No summarization model was added.
 
 ## Verification
 - 2026-11-14 [TOOL] Ran Python compilation and `python3 scripts/validate.py` — passed the Meta STT boundary, 36 exact transcript cases, explicit-help separation, location fallback, invalid/interim event rejection, provenance, conflicts and Twilio briefing checks.
@@ -32,8 +38,12 @@
 - 2026-11-14 [TOOL] Re-ran compilation, 36 transcript cases, schema validation and demo output after cleanup; behavior was unchanged.
 - 2026-11-14 [TOOL] Re-ran `python3 scripts/validate.py` and `python3 scripts/summarize.py` while preparing `RUNBOOK.md`; both passed under Python 3.12.2.
 - 2026-11-14 [TOOL] Parsed the updated API request fixture and checked `RUNBOOK.md`, `README.md`, `LEDGER.md`, and API contract files with IDE diagnostics; no errors were found.
+- 2026-11-14 [TOOL] Re-ran `python3 scripts/validate.py` and `python3 scripts/summarize.py` after dispatcher quotes; both passed. `python3 scripts/summarize.py runtime/events.example.json` printed the same roadside briefing.
+- 2026-11-14 [TOOL] Transcribed macOS `say` clips with faster-whisper 1.2.0. Operator audio “Someone is unconscious. They are gasping.” became bystander facts unresponsive and gasping. Dispatcher audio “Push hard in the center of the chest.” stayed in `transcripts`, matched no fact, and appeared as `Dispatcher said: "Push hard in the center of the chest."` Word confidence on that clip was 0.92. A mismatched `--session-id` was rejected. A 1-second microphone capture produced a transcript and briefing.
 
 ## Next steps
+- [ ] 2026-11-14 [USER] Quest audio slice: headset mic → Meta `SpeechToTextAgent` final text → `speech_transcript` with `source: operator_report`. Show `transcripts` and `spoken_text` from `scripts/dispatcher.py`. Leave camera, CPR clips, and clinical prompts out.
+- [ ] 2026-11-14 [USER] Quest: after the dispatcher is on the line, feed that call audio into speech-to-text and send `source: dispatcher_confirmed`. This repo already stores the line and quotes it in `spoken_text`.
 - [ ] 2026-11-14 [CODE] Unity teammate: connect Meta `SpeechToTextAgent` final-result callback to `speech_transcript` in `api/openapi.yaml`; include provider ID and confidence if exposed.
 - [ ] 2026-11-14 [CODE] Build a controlled Meta STT corpus from simulated operator/dispatcher audio, including ASR errors, accents, corrections, questions and multiple people; measure exact-field precision/recall and unsupported-fact rate.
 - [ ] 2026-11-14 [CODE] Add a constrained extraction fallback for utterances that deterministic rules leave unresolved; require the same `incident.py` validation and never let model output bypass source/value checks.

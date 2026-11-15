@@ -372,6 +372,23 @@ def check_briefing():
     if "Dispatcher confirms: responsive; breathing normally." not in dispatcher_summary["spoken_text"]:
         errors.append("briefing lost dispatcher provenance")
 
+    instruction = "Push hard in the center of the chest."
+    instruction_event = transcript_event(
+        "dispatcher-instruction",
+        instruction,
+        source="dispatcher_confirmed",
+        observed_at="2026-11-14T19:00:07Z",
+    )
+    instruction_summary = compose_summary(
+        reduce_events([help_event(), report, instruction_event])
+    )
+    if f'Dispatcher said: "{instruction}"' not in instruction_summary["spoken_text"]:
+        errors.append("briefing dropped a dispatcher instruction that matched no fact")
+    if not any(item["text"] == instruction for item in instruction_summary["transcripts"]):
+        errors.append("transcript list dropped the dispatcher instruction")
+    if any(fact["field"] == "response.cpr_started" for fact in instruction_summary["facts"]):
+        errors.append("unmatched dispatcher instruction was stored as CPR started")
+
     scenario_reports = [
         ("He was pulled from the water and is not breathing", "patient recovered from water"),
         ("She overdosed and is unresponsive, barely breathing", "possible substance exposure"),
@@ -391,6 +408,7 @@ def check_briefing():
         no_help,
         conflict_summary,
         dispatcher_summary,
+        instruction_summary,
     ):
         validate_summary(candidate)
         for term in FORBIDDEN_SPOKEN_TERMS:

@@ -2,10 +2,12 @@
 """Run the transcriber, reducer, and dispatcher formatter demonstration."""
 
 import json
+import sys
 from pathlib import Path
 
 from dispatcher import compose_summary
 from incident import apply_event, new_context
+from session import load_events, reduce_events
 from transcriber import extract_transcript_facts
 
 
@@ -91,7 +93,19 @@ def _demo_context():
     )
 
 
-if __name__ == "__main__":
+def summarize_events(events, title):
+    context = reduce_events(events)
+    _print_summary(
+        title,
+        compose_summary(
+            context,
+            summary_id=f"summary_{context['session_id']}",
+            created_at=events[-1]["observed_at"],
+        ),
+    )
+
+
+def _print_builtin_demos():
     example = new_context()
     for event in json.loads(
         (ROOT / "runtime/events.example.json").read_text(encoding="utf-8")
@@ -106,3 +120,22 @@ if __name__ == "__main__":
         "ADULT MALE NORMAL-BREATHING DEMO — NOT A DIAGNOSIS",
         compose_summary(_demo_context(), summary_id="summary_demo_02"),
     )
+
+
+if __name__ == "__main__":
+    if len(sys.argv) > 2:
+        raise SystemExit("Usage: python3 scripts/summarize.py [session.json]")
+    if len(sys.argv) == 2:
+        path = Path(sys.argv[1])
+        try:
+            events = load_events(path)
+        except ValueError as exc:
+            raise SystemExit(str(exc)) from exc
+        if not events:
+            raise SystemExit(f"No events in {path}")
+        try:
+            summarize_events(events, "SESSION BRIEFING — NOT A DIAGNOSIS")
+        except ValueError as exc:
+            raise SystemExit(str(exc)) from exc
+    else:
+        _print_builtin_demos()

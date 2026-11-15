@@ -8,8 +8,9 @@ receive data from a Quest headset, host an AWS endpoint, or place a Twilio call.
 - Python 3
 - A terminal opened at the repository root
 
-The current runtime uses only the Python standard library. No package installation is required
-for the commands below.
+The checks and briefing demo below use only the Python standard library. No package
+installation is required for those two commands. Transcribing a wav or the microphone
+uses the separate install in [Transcribe a recording](#transcribe-a-recording).
 
 ## Validate the runtime
 
@@ -39,6 +40,48 @@ unresponsive and breathing normally.
 
 The command does not make a network request or phone call.
 
+To print the briefing for a session file written by the audio tool:
+
+```sh
+python3 scripts/summarize.py runtime/session.json
+```
+
+## Transcribe a recording
+
+This is the laptop stand-in for Quest speech-to-text. It is separate from the commands above and needs one package install. Quest still sends finished text from Meta speech-to-text. This script fills the same `speech_transcript` event from a file or the computer microphone.
+
+```sh
+python3 -m pip install -r requirements-audio.txt
+```
+
+The first run downloads the English `small` faster-whisper model (about 460 MB) and caches it outside the repository. Later runs reuse the cache.
+
+At the start of the call, label the recording as the operator:
+
+```sh
+python3 scripts/transcribe_audio.py operator.wav --source operator_report
+```
+
+After the dispatcher is on the line, transcribe that audio separately and keep the operator on `operator_report`:
+
+```sh
+python3 scripts/transcribe_audio.py dispatcher.wav --source dispatcher_confirmed
+```
+
+Each command appends one final transcript to `runtime/session.json`, with `stt_provider` set to `faster-whisper` and word confidence when the model returns it, then prints the transcript list and the spoken briefing. Run the command again to add another line. The speaker is the `--source` argument. The script does not guess who is talking.
+
+To record from this computer's microphone for 8 seconds:
+
+```sh
+python3 scripts/transcribe_audio.py --mic --seconds 8 --source operator_report
+```
+
+`--seconds` must be from 1 to 60. macOS may ask for microphone permission the first time.
+
+`spoken_text` still summarizes operator facts in fixed sentences. Each dispatcher line is also quoted, including instructions that do not match a fact, for example: `Dispatcher said: "Push hard in the center of the chest."`
+
+`runtime/session.json` is local session state and is gitignored. Delete it to start a new session. Pass `--session path.json` and `--session-id your_id` to write somewhere else. A file that already belongs to another session id is left unchanged.
+
 ## What is incoming
 
 The intended live boundary starts after Meta Unity AI Speech to Text. Unity sends final
@@ -65,6 +108,7 @@ Example client requests are in `api/request-examples.json`.
 2. `scripts/incident.py` validates events, rejects unauthorized sources, tracks conflicts, and
    reduces accepted events into incident state.
 3. `scripts/dispatcher.py` builds a deterministic, evidence-labeled `spoken_text` briefing.
+   Dispatcher lines are quoted in that briefing as well as stored in `transcripts`.
 4. `scripts/summarize.py` composes the complete structured summary.
 
 The LLM, if one is added, belongs before the reducer as a constrained proposal generator. Its
@@ -73,7 +117,8 @@ script directly.
 
 ## What is outgoing
 
-Running the project now writes only to the terminal. The composed summary includes:
+The standard-library commands write only to the terminal. The audio command also writes
+`runtime/session.json`. The composed summary includes:
 
 - whether help was explicitly requested;
 - location and location provenance;
@@ -93,7 +138,9 @@ No current code performs that handoff.
 ## Teammate integration boundaries
 
 - **Unity:** send final Meta STT text, explicit help requests, authorized location updates, and
-  stable session/event IDs. Do not infer help from speech.
+  stable session/event IDs. Label headset speech `operator_report`. After the dispatcher is on
+  the line, send that audio as `dispatcher_confirmed`. Do not infer help from speech. The laptop
+  `faster-whisper` script is only a stand-in for the same event.
 - **AWS:** authenticate and validate requests, extract transcript facts, reduce events, persist
   session state, and return the deterministic summary.
 - **Twilio:** accept only allowlisted simulation destinations, report call status, and speak the
