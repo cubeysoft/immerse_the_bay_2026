@@ -78,7 +78,7 @@ python3 scripts/transcribe_audio.py --mic --seconds 8 --source operator_report
 
 `--seconds` must be from 1 to 60. macOS may ask for microphone permission the first time.
 
-`spoken_text` still summarizes operator facts in fixed sentences. Each dispatcher line is also quoted, including instructions that do not match a fact, for example: `Dispatcher said: "Push hard in the center of the chest."`
+`transcripts` keeps every finished operator and dispatcher line. `spoken_text` is a separate natural-language briefing for dispatch. A dispatcher instruction that matches no fact is included in that briefing, for example: “The dispatcher said, push hard in the center of the chest.”
 
 `runtime/session.json` is local session state and is gitignored. Delete it to start a new session. Pass `--session path.json` and `--session-id your_id` to write somewhere else. A file that already belongs to another session id is left unchanged.
 
@@ -107,8 +107,9 @@ Example client requests are in `api/request-examples.json`.
 1. `scripts/transcriber.py` extracts only supported, explicitly stated facts from final speech.
 2. `scripts/incident.py` validates events, rejects unauthorized sources, tracks conflicts, and
    reduces accepted events into incident state.
-3. `scripts/dispatcher.py` builds a deterministic, evidence-labeled `spoken_text` briefing.
-   Dispatcher lines are quoted in that briefing as well as stored in `transcripts`.
+3. `scripts/dispatcher.py` keeps every final line in `transcripts` and writes a separate
+   natural-language `spoken_text` briefing for dispatch. Dispatcher instructions that
+   match no fact are included in that briefing.
 4. `scripts/summarize.py` composes the complete structured summary.
 
 The LLM, if one is added, belongs before the reducer as a constrained proposal generator. Its

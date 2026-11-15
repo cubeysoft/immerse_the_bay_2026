@@ -267,6 +267,6 @@ components:
         spoken_text:
           type: string
           description: >
-            Deterministic spoken briefing for simulated telephony read-back. Starts with
-            explicit help status and operator-reported or authorized device location.
+            Natural-language briefing spoken to simulated dispatch. Separate from
+            transcripts, which keep every final operator and dispatcher line verbatim.
         note: {type: string}

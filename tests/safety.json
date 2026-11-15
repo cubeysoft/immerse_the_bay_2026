@@ -3,12 +3,12 @@
     {
       "id": "help_is_explicit",
       "given": "A transcript describes an emergency but no help button event exists",
-      "assert": "incident.help_requested remains unknown and spoken_text says help request not confirmed"
+      "assert": "incident.help_requested remains unknown and spoken_text says a help request has not been confirmed"
     },
     {
       "id": "help_survives_stt_failure",
       "given": "The app emits help_request but Meta STT returns no final transcript",
-      "assert": "spoken_text still says emergency assistance requested"
+      "assert": "spoken_text still says emergency assistance has been requested"
     },
     {
       "id": "final_transcripts_only",

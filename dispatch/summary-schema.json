@@ -229,7 +229,7 @@
     "spoken_text": {
       "type": "string",
       "minLength": 1,
-      "description": "Deterministic spoken read-back for simulated dispatch. Must never reference the camera or CV pipeline."
+      "description": "Natural-language briefing sent to simulated dispatch. The transcripts array keeps every final spoken line separately. Must never reference the camera or CV pipeline."
     },
     "note": {
       "type": "string"

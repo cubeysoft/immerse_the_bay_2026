@@ -326,9 +326,9 @@ def check_briefing():
 
     summary = compose_summary(reduce_events([help_event(), geo, report]))
     expected_phrases = (
-        "Emergency assistance requested.",
-        "Device location: near 450 Serra Mall, within 12 meters.",
-        "Bystander reports: adult; male; unresponsive; breathing normally.",
+        "Emergency assistance has been requested.",
+        "The device is near 450 Serra Mall, within 12 meters.",
+        "The bystander reports an adult male who is unresponsive and breathing normally.",
     )
     for phrase in expected_phrases:
         if phrase not in summary["spoken_text"]:
@@ -339,7 +339,7 @@ def check_briefing():
         errors.append("minimum briefing still contains medical recognition output")
 
     no_help = compose_summary(reduce_events([geo, report]))
-    if "Help request not confirmed." not in no_help["spoken_text"]:
+    if "A help request has not been confirmed." not in no_help["spoken_text"]:
         errors.append("speech incorrectly implied explicit help activation")
 
     normal = transcript_event(
@@ -357,7 +357,7 @@ def check_briefing():
     if first["facts"] != second["facts"] or first["conflicts"] != second["conflicts"]:
         errors.append("arrival order changed current facts or normalized conflicts")
     conflict_summary = compose_summary(first)
-    if "Reports conflict on breathing" not in conflict_summary["spoken_text"]:
+    if "The reports disagree about breathing." not in conflict_summary["spoken_text"]:
         errors.append("briefing did not disclose changed breathing report")
 
     dispatcher = transcript_event(
@@ -369,7 +369,10 @@ def check_briefing():
     dispatcher_summary = compose_summary(
         reduce_events([help_event(), report, dispatcher])
     )
-    if "Dispatcher confirms: responsive; breathing normally." not in dispatcher_summary["spoken_text"]:
+    if (
+        "The dispatcher confirms that the patient is responsive and breathing normally."
+        not in dispatcher_summary["spoken_text"]
+    ):
         errors.append("briefing lost dispatcher provenance")
 
     instruction = "Push hard in the center of the chest."
@@ -382,7 +385,10 @@ def check_briefing():
     instruction_summary = compose_summary(
         reduce_events([help_event(), report, instruction_event])
     )
-    if f'Dispatcher said: "{instruction}"' not in instruction_summary["spoken_text"]:
+    if (
+        "The dispatcher said, push hard in the center of the chest."
+        not in instruction_summary["spoken_text"]
+    ):
         errors.append("briefing dropped a dispatcher instruction that matched no fact")
     if not any(item["text"] == instruction for item in instruction_summary["transcripts"]):
         errors.append("transcript list dropped the dispatcher instruction")
@@ -390,10 +396,10 @@ def check_briefing():
         errors.append("unmatched dispatcher instruction was stored as CPR started")
 
     scenario_reports = [
-        ("He was pulled from the water and is not breathing", "patient recovered from water"),
+        ("He was pulled from the water and is not breathing", "the patient was recovered from water"),
         ("She overdosed and is unresponsive, barely breathing", "possible substance exposure"),
-        ("He touched a live wire and is unresponsive", "electrical contact"),
-        ("There is visible smoke and the patient is gasping", "visible smoke"),
+        ("He touched a live wire and is unresponsive", "the patient made electrical contact"),
+        ("There is visible smoke and the patient is gasping", "smoke is visible"),
         ("He has a bleeding head injury from a fall", "bleeding head injury"),
     ]
     for index, (text, expected) in enumerate(scenario_reports):
@@ -426,10 +432,16 @@ def check_examples():
         except EventValidationError as exc:
             errors.append(f"invalid runtime fixture {event.get('event_id')}: {exc}")
     fixture_summary = compose_summary(context)
-    if "Emergency assistance requested." not in fixture_summary["spoken_text"]:
+    if "Emergency assistance has been requested." not in fixture_summary["spoken_text"]:
         errors.append("runtime fixture lost explicit help request")
     if len(fixture_summary["transcripts"]) != 2:
         errors.append("runtime fixture did not retain both Meta STT transcripts")
+    fixture_text = [item["text"] for item in fixture_summary["transcripts"]]
+    if fixture_text != [
+        "I am by the highway. Someone is unconscious.",
+        "They are gasping.",
+    ]:
+        errors.append("runtime fixture changed the verbatim transcript")
 
     example = load("dispatch/summary.example.json")
     try:

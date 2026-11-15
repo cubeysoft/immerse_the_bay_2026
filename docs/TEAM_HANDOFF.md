@@ -38,6 +38,23 @@ Suggested architecture: API Gateway → Lambda → DynamoDB plus a phone adapter
 - Maintain auth, encryption, event retention and no provider secrets in Unity.
 - Decide whether audio uses a paired phone or a genuine VoIP bridge; initiating an outbound phone call alone is not an audio bridge.
 
+## Quest teammate
+
+This repository stays separate from the Unity project. Do not copy `scripts/` into the Quest app. The headset sends finished events, and this runtime returns two different texts:
+
+- `transcripts`: every final line, in order, with who said it. This is the record of everything said.
+- `spoken_text`: the natural-language briefing that dispatch hears. It is not a dump of the transcript.
+
+What you can wire into the Quest repo now:
+
+1. On each final Meta `SpeechToTextAgent` result, POST one `speech_transcript`. Copy the shape from `submit_event` in `api/request-examples.json`.
+2. Label the headset microphone `operator_report`. When the dispatcher is on the line and that audio can be heard, label those lines `dispatcher_confirmed`.
+3. The help button sends `help_request` by itself. Do not set help from the words in the transcript.
+4. Show both `transcripts` and `spoken_text` from the summary. Send only `spoken_text` to the phone read-back.
+5. Leave camera frames, CPR clips, and clinical prompts out of this slice.
+
+Until the AWS endpoint exists, the same two outputs can be checked locally with `python3 scripts/summarize.py`. The HTTP paths are in `api/openapi.yaml`.
+
 ## Unity integration owner
 
 Integrate Meta's `SpeechToTextAgent`, emit only final transcripts, provide an explicit help control, collect authorized location and POST events through an HTTP adapter. A simplified Unity C# coroutine for *authorized staging endpoints*:

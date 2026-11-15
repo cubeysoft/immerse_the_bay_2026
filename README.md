@@ -2,7 +2,7 @@
 
 This repository takes a finished transcript and keeps two results: the exact words, and a short spoken briefing for a simulated dispatcher.
 
-A laptop can also turn a wav file or a microphone clip into that transcript. The Quest app is what hears the headset. This code starts once the words exist. It pulls out a few explicit facts, such as “unconscious” or “gasping,” and quotes the dispatcher’s own sentences in the briefing.
+A laptop can also turn a wav file or a microphone clip into that transcript. The Quest app is what hears the headset. This code starts once the words exist. It keeps every finished line in the transcript, pulls out a few explicit facts such as “unconscious” or “gasping,” and turns those facts into a spoken briefing for dispatch.
 
 ## Run it on a new machine
 
@@ -60,7 +60,7 @@ Print a saved session again with:
 python3 scripts/summarize.py runtime/session.json
 ```
 
-Operator sentences become short fact lines when the rules recognize them. A dispatcher sentence is also repeated, including instructions that match no fact, for example: `Dispatcher said: "Push hard in the center of the chest."`
+The transcript keeps every finished line. The spoken briefing is a separate natural-language summary for dispatch. A dispatcher instruction that matches no fact is still included, for example: “The dispatcher said, push hard in the center of the chest.”
 
 ## What this folder does not run
 

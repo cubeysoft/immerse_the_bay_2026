@@ -22,9 +22,15 @@ def _print_summary(title, summary):
         f"{summary['location']['description'] or 'Unconfirmed'}"
     )
     print(f"Conflicts: {len(summary['conflicts'])}")
-    print(f"Transcripts: {len(summary['transcripts'])}")
     print(f"Unknown fields: {', '.join(summary['unknown_fields']) or 'none'}")
-    print(f"Spoken read-back: {summary['spoken_text']}")
+    print("Transcript:")
+    if summary["transcripts"]:
+        for item in summary["transcripts"]:
+            speaker = "Operator" if item["source"] == "operator_report" else "Dispatcher"
+            print(f"  {speaker}: {item['text']}")
+    else:
+        print("  none")
+    print(f"Spoken briefing: {summary['spoken_text']}")
 
 
 def _operator_event(session_id, event_id, transcript, observed_at):

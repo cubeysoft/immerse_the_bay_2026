@@ -62,6 +62,6 @@
       "confidence": 0.88
     }
   ],
-  "spoken_text": "Simulated emergency briefing. Emergency assistance requested. Caller reports roadside location; exact address unconfirmed. Bystander reports: unresponsive; gasping.",
+  "spoken_text": "This is a simulated emergency briefing. Emergency assistance has been requested. The caller is at the roadside, and the exact address is still unconfirmed. The bystander reports that the patient is unresponsive and gasping.",
   "note": "Deterministic simulated dispatcher briefing from explicit help, location, and source-labelled reports. Not a medical diagnosis."
 }
